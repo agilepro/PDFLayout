@@ -7,6 +7,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
+import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
 
 /**
  * Shapes can be used to either
@@ -17,7 +18,7 @@ import com.purplehillsbooks.pdflayout.text.Position;
  * {@link #add(PDDocument, PDPageContentStream, Position, float, float) add the
  * path} of the shape to the drawing context.
  */
-public interface Shape {
+public abstract class Shape {
 
     /**
      * Draws (strokes) the shape.
@@ -43,9 +44,25 @@ public interface Shape {
      * @throws Exception
      *             by pdfbox
      */
-    void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, float width, float height, Color color,
-            Stroke stroke, DrawListener drawListener) throws Exception;
+            Stroke stroke, DrawListener drawListener) throws Exception {
+
+        add(pdDocument, contentStream, upperLeft, width, height);
+
+        if (stroke != null) {
+            stroke.applyTo(contentStream);
+        }
+        if (color != null) {
+            contentStream.setStrokingColor(color);
+        }
+        contentStream.stroke();
+
+        if (drawListener != null) {
+            drawListener.drawn(this, upperLeft, width, height);
+        }
+
+    }
 
     /**
      * Fills the shape.
@@ -69,9 +86,22 @@ public interface Shape {
      * @throws Exception
      *             by pdfbox
      */
-    void fill(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void fill(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, float width, float height, Color color,
-            DrawListener drawListener) throws Exception;
+            DrawListener drawListener) throws Exception {
+
+        add(pdDocument, contentStream, upperLeft, width, height);
+
+        if (color != null) {
+            contentStream.setNonStrokingColor(color);
+        }
+        CompatibilityHelper.fillNonZero(contentStream);
+
+        if (drawListener != null) {
+            drawListener.drawn(this, upperLeft, width, height);
+        }
+
+    }
 
     /**
      * Adds (the path of) the shape without drawing anything.
@@ -89,7 +119,7 @@ public interface Shape {
      * @throws Exception
      *             by pdfbox
      */
-    void add(PDDocument pdDocument, PDPageContentStream contentStream,
+    public abstract void add(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, float width, float height) throws Exception;
 
 }

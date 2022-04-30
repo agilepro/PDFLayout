@@ -1,5 +1,6 @@
 package com.purplehillsbooks.pdflayout.elements.render;
 
+import java.awt.Color;
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -8,6 +9,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import com.purplehillsbooks.pdflayout.elements.ControlElement;
+import com.purplehillsbooks.pdflayout.elements.Dimension;
 import com.purplehillsbooks.pdflayout.elements.PDFDoc;
 import com.purplehillsbooks.pdflayout.elements.Element;
 import com.purplehillsbooks.pdflayout.elements.Orientation;
@@ -367,6 +369,17 @@ public class RenderContext implements Renderer, Closeable, DrawContext, DrawList
         resetMaxPositionOnPage();
         document.beforePage(this);
         annotationDrawListener.beforePage(this);
+        
+        if (document.showMargins) {
+            PageFormat pf = document.getPageFormat();
+            Dimension dim = pf.getInteriorDimension();
+            contentStream.setStrokingColor(Color.red);
+            contentStream.setLineDashPattern(new float[]{9}, 0);
+            contentStream.setLineWidth(0.5f);
+            contentStream.addRect(pf.getMarginLeft(), pf.getMarginBottom(),
+                    dim.getWidth(), dim.getHeight());
+            contentStream.stroke();
+        }
     }
 
     /**

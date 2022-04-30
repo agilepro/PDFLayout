@@ -9,7 +9,7 @@ import com.purplehillsbooks.pdflayout.text.Position;
 /**
  * A simple rectangular shape.
  */
-public class Rect extends AbstractShape {
+public class Rect extends Shape {
 
     @Override
     public void add(PDDocument pdDocument, PDPageContentStream contentStream,

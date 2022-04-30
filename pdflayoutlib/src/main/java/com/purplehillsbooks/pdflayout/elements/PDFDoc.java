@@ -20,27 +20,32 @@ import com.purplehillsbooks.pdflayout.elements.render.VerticalLayout;
 import com.purplehillsbooks.pdflayout.elements.render.VerticalLayoutHint;
 
 /**
- * The central class for creating a document.  Construct the PDFDoc first,
+ * <p>The central class for creating a document.  Construct the PDFDoc first,
  * and then fill it with Frames and Paragraphs.
- * 
+ * </p>
+ * <p>
  * The PDFDoc has a PageFormat object that specifies how the document will
  * be composed.  The Page has an overall dimensions, and then four margins:
  * left, right, top, and bottom.  
- * 
+ * </p>
+ * <p>
  * All measures are in points which are defined here as 72 points/inch.
  * (yes, I know traditionally a point was estimated by Donald
  * Knuth to be 72.27 points per inch, but actually there are probably a dozen
  * different definitions of the point, and it is otherwise a completely 
  * arbitrary value since typefaces of the same point size can in fact be 
  * completely different actual sizes. etc. etc. etc.)
- * 
+ * </p>
+ * <p>
  * The document is a list of elements, mostly Frame objects.  You can get a 
  * top level Frame inside the margins using newInteriorFrame().  Each request
  * creates another Frame after the first.  You can create Frames within Frames, 
  * and then ultimately Paragraphs within Frames.
- * 
+ * </p>
+ * <p>
  * Call saveToFile or saveToStream, and the document will be rendered, and output.
- * 
+ * </p>
+ * <p>
  * Rendering the document is the act of word-wrapping all paragraphs, 
  * calculating the height of all Frame (given the width constraints and contents) 
  * and then broken up into page objects.  Frames or Paragraphs can break across
@@ -50,6 +55,8 @@ import com.purplehillsbooks.pdflayout.elements.render.VerticalLayoutHint;
  * should render only once for each document constructed.  This is not a persistent
  * form for storing a document.
  * 
+ * </p>
+ *
  */
 public class PDFDoc implements RenderListener {
 
@@ -65,6 +72,11 @@ public class PDFDoc implements RenderListener {
     private PDDocument pdDocument;
     private PageFormat pageFormat;
 
+
+    //public setting on whether to produce debug out put of margins
+    public boolean showMargins = false;
+    
+    
     /**
      * Creates a Document using the {@link #DEFAULT_PAGE_FORMAT}.
      */

@@ -10,7 +10,7 @@ import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
 /**
  * A rectangular shape with rounded corners.
  */
-public class RoundRect extends AbstractShape {
+public class RoundRect extends Shape {
 
     private final static float BEZ = 0.551915024494f;
 
