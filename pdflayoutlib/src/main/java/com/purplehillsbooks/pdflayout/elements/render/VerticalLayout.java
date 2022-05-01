@@ -72,10 +72,10 @@ public class VerticalLayout implements Layout {
     }
 
     @Override
-    public boolean render(RenderContext renderContext, Element element,
+    public boolean renderWithHint(RenderContext renderContext, Element element,
             LayoutHint layoutHint) throws Exception {
         if (element instanceof Drawable) {
-            render(renderContext, (Drawable) element, layoutHint);
+            renderDrawable(renderContext, (Drawable) element, layoutHint);
             return true;
         }
         if (element == ControlElement.NEWPAGE) {
@@ -86,10 +86,10 @@ public class VerticalLayout implements Layout {
         return false;
     }
 
-    public void render(final RenderContext renderContext, Drawable drawable,
+    public void renderDrawable(final RenderContext renderContext, Drawable drawable,
             final LayoutHint layoutHint) throws Exception {
         if (drawable.getAbsolutePosition() != null) {
-            renderAbsolute(renderContext, drawable, layoutHint,
+            renderAbsolute(renderContext, drawable,
                     drawable.getAbsolutePosition());
         } else {
             renderReleative(renderContext, drawable, layoutHint);
@@ -103,15 +103,13 @@ public class VerticalLayout implements Layout {
      *            the context providing all rendering state.
      * @param drawable
      *            the drawable to draw.
-     * @param layoutHint
-     *            the layout hint used to layout.
      * @param position
      *            the left upper position to start drawing at.
      * @throws Exception
      *             by pdfbox
      */
     protected void renderAbsolute(final RenderContext renderContext,
-            Drawable drawable, final LayoutHint layoutHint,
+            Drawable drawable,
             final Position position) throws Exception {
         drawable.draw(renderContext.getPdDocument(),
                 renderContext.getContentStream(), position, renderContext);
@@ -135,17 +133,21 @@ public class VerticalLayout implements Layout {
      */
     protected void renderReleative(final RenderContext renderContext,
             Drawable drawable, final LayoutHint layoutHint) throws Exception {
+        
+        /*
         VerticalLayoutHint verticalLayoutHint = null;
         if (layoutHint instanceof VerticalLayoutHint) {
-            verticalLayoutHint = (VerticalLayoutHint) layoutHint;
+            verticalLayoutHint = (VerticalLayoutHint) layoutHint;8
             if (verticalLayoutHint.getMarginTop() > 0) {
                 layoutAndDrawReleative(renderContext, new VerticalSpacer(
                         verticalLayoutHint.getMarginTop()), verticalLayoutHint);
             }
         }
+        */
 
-        layoutAndDrawReleative(renderContext, drawable, verticalLayoutHint);
+        layoutAndDrawReleative(renderContext, drawable, layoutHint);
 
+        /*
         if (verticalLayoutHint != null) {
             if (verticalLayoutHint.getMarginBottom() > 0) {
                 layoutAndDrawReleative(renderContext, new VerticalSpacer(
@@ -153,6 +155,7 @@ public class VerticalLayout implements Layout {
                         verticalLayoutHint);
             }
         }
+        */
     }
 
     /**
@@ -176,6 +179,8 @@ public class VerticalLayout implements Layout {
 
         float targetWidth = getTargetWidth(renderContext);
         boolean movePosition = true;
+        
+        /*
         VerticalLayoutHint verticalLayoutHint = null;
         if (layoutHint instanceof VerticalLayoutHint) {
             verticalLayoutHint = (VerticalLayoutHint) layoutHint;
@@ -183,18 +188,19 @@ public class VerticalLayout implements Layout {
             targetWidth -= verticalLayoutHint.getMarginRight();
             movePosition = !verticalLayoutHint.isResetY();
         }
+        */
 
         float oldMaxWidth = -1;
         if (drawable instanceof WidthRespecting) {
             WidthRespecting flowing = (WidthRespecting) drawable;
             oldMaxWidth = flowing.getMaxWidth();
-            if (oldMaxWidth < 0) {
+            if (oldMaxWidth <= 0) {
                 flowing.setMaxWidth(targetWidth);
             }
         }
 
-        Drawable drawablePart = removeLeadingEmptyVerticalSpace(drawable,
-                renderContext);
+        Drawable drawablePart = removeEmptySpaceIfTopOfPage(drawable, renderContext);
+        
         while (renderContext.getRemainingHeight() < drawablePart.getHeight()) {
             Dividable dividable = null;
             if (drawablePart instanceof Dividable) {
@@ -212,7 +218,7 @@ public class VerticalLayout implements Layout {
             turnPage(renderContext);
 
             drawablePart = divided.getTail();
-            drawablePart = removeLeadingEmptyVerticalSpace(drawablePart,
+            drawablePart = removeEmptySpaceIfTopOfPage(drawablePart,
                     renderContext);
         }
 
@@ -251,6 +257,8 @@ public class VerticalLayout implements Layout {
             throws Exception {
         PDPageContentStream contentStream = renderContext.getContentStream();
         PageFormat pageFormat = renderContext.getPageFormat();
+        
+        //calculate how much indent is needed for left, center, and right alignment
         float offsetX = 0;
         if (layoutHint instanceof VerticalLayoutHint) {
             VerticalLayoutHint verticalLayoutHint = (VerticalLayoutHint) layoutHint;
@@ -259,14 +267,13 @@ public class VerticalLayout implements Layout {
                     - drawable.getWidth();
             switch (alignment) {
             case Right:
-                offsetX = horizontalExtraSpace
-                        - verticalLayoutHint.getMarginRight();
+                offsetX = horizontalExtraSpace; // - verticalLayoutHint.getMarginRight();
                 break;
             case Center:
                 offsetX = horizontalExtraSpace / 2f;
                 break;
             default:
-                offsetX = verticalLayoutHint.getMarginLeft();
+                offsetX = 0; //verticalLayoutHint.getMarginLeft();
                 break;
             }
         }
@@ -310,7 +317,7 @@ public class VerticalLayout implements Layout {
      * @throws Exception
      *             by pdfbox
      */
-    protected Drawable removeLeadingEmptyVerticalSpace(final Drawable drawable,
+    protected Drawable removeEmptySpaceIfTopOfPage(final Drawable drawable,
             final RenderContext renderContext) throws Exception {
         if (isRemoveLeadingEmptyVerticalSpace()
                 && isPositionTopOfPage(renderContext)) {

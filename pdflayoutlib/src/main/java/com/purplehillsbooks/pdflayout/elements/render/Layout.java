@@ -8,4 +8,8 @@ import com.purplehillsbooks.pdflayout.elements.Element;
  */
 public interface Layout extends Element, Renderer {
 
+    
+    // from Renderer you get:
+    // boolean render(final RenderContext renderContext, final Element element,
+    //                final LayoutHint layoutHint) throws Exception;
 }

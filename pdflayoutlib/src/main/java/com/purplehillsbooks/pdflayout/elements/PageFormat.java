@@ -21,10 +21,10 @@ public class PageFormat implements Element {
     private final int rotation;
 
     /**
-     * Creates a PageFormat with A4 portrait without margins.
+     * Creates a PageFormat with A4 portrait with 1/2 inch margins on all sides
      */
     public PageFormat() {
-        this(PDRectangle.LETTER);
+        this(PDRectangle.LETTER, Orientation.Portrait, 36, 36, 36, 36);
     }
 
     /**

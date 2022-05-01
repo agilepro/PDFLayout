@@ -1,7 +1,6 @@
 package com.purplehillsbooks.pdflayout.elements.render;
 
 import java.awt.Color;
-import java.io.Closeable;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -28,7 +27,7 @@ import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
  * The render context is a container providing all state of the current
  * rendering process.
  */
-public class RenderContext implements Renderer, Closeable, DrawContext, DrawListener {
+public class RenderContext implements DrawContext, DrawListener {
 
     private final PDFDoc document;
     private final PDDocument pdDocument;
@@ -273,11 +272,11 @@ public class RenderContext implements Renderer, Closeable, DrawContext, DrawList
         return pageIndex;
     }
 
-    @Override
-    public boolean render(RenderContext renderContext, Element element,
-            LayoutHint layoutHint) throws Exception {
-        boolean success = getLayout()
-                .render(renderContext, element, layoutHint);
+
+    public boolean startRendering(Element element, LayoutHint layoutHint) throws Exception {
+        
+        boolean success = layout.renderWithHint(this, element, layoutHint);
+        
         if (success) {
             return true;
         }
@@ -409,7 +408,7 @@ public class RenderContext implements Renderer, Closeable, DrawContext, DrawList
         return false;
     }
 
-    @Override
+
     public void close() throws IOException {
         try {
             closePage();

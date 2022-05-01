@@ -22,7 +22,7 @@ public interface Renderer {
      * @throws Exception
      *             by pdfbox
      */
-    boolean render(final RenderContext renderContext, final Element element,
+    boolean renderWithHint(final RenderContext renderContext, final Element element,
             final LayoutHint layoutHint) throws Exception;
 
 }

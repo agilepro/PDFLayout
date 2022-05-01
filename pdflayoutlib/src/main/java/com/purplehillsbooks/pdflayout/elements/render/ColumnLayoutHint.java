@@ -1,6 +1,5 @@
 package com.purplehillsbooks.pdflayout.elements.render;
 
-import com.purplehillsbooks.pdflayout.elements.render.VerticalLayoutHint.VerticalLayoutHintBuilder;
 import com.purplehillsbooks.pdflayout.text.Alignment;
 
 /**
@@ -47,10 +46,10 @@ public class ColumnLayoutHint extends VerticalLayoutHint {
      * @param marginBottom
      *            the bottom alignment.
      */
-    public ColumnLayoutHint(Alignment alignment, float marginLeft,
-            float marginRight, float marginTop, float marginBottom) {
-        super(alignment, marginLeft, marginRight, marginTop, marginBottom);
-    }
+    //public ColumnLayoutHint(Alignment alignment, float marginLeft,
+    //        float marginRight, float marginTop, float marginBottom) {
+    //    super(alignment, marginLeft, marginRight, marginTop, marginBottom);
+    //}
 
     /**
      * Creates a layout hint with the given alignment and margins.
@@ -69,25 +68,28 @@ public class ColumnLayoutHint extends VerticalLayoutHint {
      *            if <code>true</code>, the y coordinate will be reset to the
      *            point before layouting the element.
      */
+    /*
     public ColumnLayoutHint(Alignment alignment, float marginLeft,
             float marginRight, float marginTop, float marginBottom,
             boolean resetY) {
         super(alignment, marginLeft, marginRight, marginTop, marginBottom,
                 resetY);
     }
+    */
 
 
     /**
-     * @return a {@link VerticalLayoutHintBuilder} for creating a
-     *         {@link VerticalLayoutHint} using a fluent API.
+     * @return a {@link ColumnLayoutHintBuilder} for creating a
+     *         {@link ColumnLayoutHint} using a fluent API.
      */
-    public static ColumnLayoutHintBuilder builder() {
-        return new ColumnLayoutHintBuilder();
-    }
+    //public static ColumnLayoutHintBuilder builder() {
+    //    return new ColumnLayoutHintBuilder();
+    //}
 
     /**
      * A builder for creating a {@link VerticalLayoutHint} using a fluent API.
      */
+    /*
     public static class ColumnLayoutHintBuilder extends VerticalLayoutHintBuilder {
 
         public ColumnLayoutHint build() {
@@ -96,4 +98,5 @@ public class ColumnLayoutHint extends VerticalLayoutHint {
         }
 
     }
+    */
 }

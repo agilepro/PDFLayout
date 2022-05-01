@@ -72,6 +72,10 @@ import com.purplehillsbooks.pdflayout.text.WidthRespecting;
  * Frame by using newInteriorFrame as well.  In order to indent a section of the document, 
  * create a frame with left margin/padding.
  * </p>
+ * <p>
+ * The standard drawable has a width and a height. This is the EXTERIOR width and height.
+ * Because the frame has margin and padding, the INTERIOR width and height can be smaller.
+ * The border also has its own width and height in between these.
  * 
  */
 public class Frame implements Element, Drawable, WidthRespecting, Dividable {
@@ -500,15 +504,42 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     }
 
     /**
-     * @return the sum of top/bottom margin, padding and border width.
+     * @return the sum of top/bottom margin, padding and border width.  This is specifically
+     *         all the vertical spacing that is NOT from the content of the frame.   It is all
+     *         the border spacing.
      */
-    protected float getVerticalSpacing() {
+    protected float getVerticalExtraSpace() {
         return getMarginTop() + getMarginBottom() + getVerticalShapeSpacing();
     }
+    
+    /*
+     * @return the sum of whitespace BEFORE any printable content.
+     */
+    protected float getLeadingWhiteSpace() {
+        float myTop = getMarginTop() + getPaddingTop();
+        if (innerList.isEmpty())  {
+            return myTop;
+        }
+        Drawable firstChild = innerList.get(0);
+        if (firstChild instanceof Frame) {
+            return myTop + ((Frame)firstChild).getLeadingWhiteSpace();
+        }
+        return myTop;
+    }
 
+    /**
+     * @param val Set the fixed total EXTERIOR height of the frame.  Remember, the border will be 
+     * smaller than this by the margin amount, and the content will be smaller by both
+     * the margin and the padding.
+     */
     public void setGivenHeight(float val) {
         givenHeight = val;
     }
+    /**
+     * @param val Set the fixed total EXTERIOR width of the frame.  Remember, the border will be 
+     * smaller than this by the margin amount, and the content will be smaller by both
+     * the margin and the padding.
+     */
     public void setGivenWidth(float val) {
         givenWidth = val;
     }
@@ -516,7 +547,7 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     @Override
     public float getWidth() throws Exception {
         if (givenWidth>0) {
-            return givenWidth + getMarginLeft() + getMarginRight();
+            return givenWidth;
         }
         return getMaxWidth(innerList) + getHorizontalSpacing();
     }
@@ -534,12 +565,12 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     @Override
     public float getHeight() throws Exception {
         if (givenHeight>0) {
-            return givenHeight + getMarginTop() + getMarginBottom();
+            return givenHeight;
         }
-        return getHeight(innerList) + getVerticalSpacing();
+        return getHeight(innerList) + getVerticalExtraSpace();
     }
 
-    protected float getHeight(List<Drawable> drawableList) throws Exception {
+    private static float getHeight(List<Drawable> drawableList) throws Exception {
         float height = 0;
         if (drawableList != null) {
             for (Drawable inner : drawableList) {
@@ -572,33 +603,30 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     @Override
     public void setMaxWidth(float maxWidth) {
         this.maxWidth = maxWidth;
+        
+        float interiorMaxWidth = maxWidth - this.getHorizontalSpacing();
+        if (givenWidth > 0) {
+            //not sure what to do when the width has been set too big.
+            //for now we just assume given width is sacrosanct
+            interiorMaxWidth = givenWidth - this.getHorizontalSpacing();
+        }
 
         for (Drawable inner : innerList) {
-            setMaxWidth(inner, maxWidth);
-        }
-    }
-
-    private void setMaxWidth(final Drawable inner, float maxWidth) {
-        if (inner instanceof WidthRespecting) {
-            if (givenWidth > 0) {
-                ((WidthRespecting) inner).setMaxWidth(givenWidth - getHorizontalShapeSpacing());
-            } else if (maxWidth >= 0) {
-                ((WidthRespecting) inner).setMaxWidth(maxWidth
-                        - getHorizontalSpacing());
+            if (inner instanceof WidthRespecting) {
+                ((WidthRespecting) inner).setMaxWidth(interiorMaxWidth);
             }
         }
     }
 
+
     /**
-     * Propagates the max width to the inner item if there is a given size, but
-     * no absolute position.
-     *
-     * @throws Exception
-     *             by pdfbox.
+     * Propagates the max width to the inner items if there is a given size, but
+     * no absolute position.  Given width will override any maxwidth specified
+     * for any other reason.
      */
-    protected void setInnerMaxWidthIfNecessary() throws Exception {
+    protected void propagateMaxWidthToChildren() throws Exception {
         if (getAbsolutePosition() == null && givenWidth>0) {
-            setMaxWidth(givenWidth - getHorizontalShapeSpacing());
+            setMaxWidth(givenWidth);
         }
     }
 
@@ -606,7 +634,7 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, DrawListener drawListener) throws Exception {
 
-        setInnerMaxWidthIfNecessary();
+        propagateMaxWidthToChildren();
 
         float halfBorderWidth = 0;
         if (getBorderWidth() > 0) {
@@ -653,21 +681,22 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     }
 
     @Override
-    public Divided divide(float remainingHeight, float nextPageHeight)
-            throws Exception {
-        setInnerMaxWidthIfNecessary();
+    public Divided divide(float remainingHeight, float nextPageHeight) throws Exception {
+        propagateMaxWidthToChildren();
 
-        if (remainingHeight - getVerticalSpacing() <= 0) {
+        if (remainingHeight <= getLeadingWhiteSpace()) {
+            // in this case, the "overhead" space of the frame is more than the remaining
+            // space, so just move the entire frame to the next page, and fill this page
+            // with white vertical space.
             return new Divided(new VerticalSpacer(remainingHeight), this);
         }
 
-        // find first inner that does not fit on page
-        float spaceLeft = remainingHeight - getVerticalSpacing();
+        // we have to account for the extra white space at the top of the frame
+        float spaceLeft = remainingHeight - getMarginTop() - getPaddingTop();
 
         DividedList dividedList = divideList(innerList, spaceLeft);
 
-        float spaceLeftForDivided = spaceLeft
-                - getHeight(dividedList.getHead());
+        float spaceLeftForDivided = spaceLeft - getHeight(dividedList.getHead());
         Divided divided = null;
 
         if (dividedList.getDrawableToDivide() != null) {
@@ -679,7 +708,7 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
             }
             // some space left on this page for the inner element
             divided = innerDividable.divide(spaceLeftForDivided, nextPageHeight
-                    - getVerticalSpacing());
+                    - getVerticalExtraSpace());
         }
 
         Float firstHeight = givenHeight<=0 ? 0 : remainingHeight;
@@ -688,6 +717,8 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
         // create head sub frame
         Frame first = new Frame(givenWidth, firstHeight);
         copyAllButInnerAndSizeTo(first);
+        first.setPaddingBottom(0);   //bottom padding eliminated because this is split
+        first.setMarginBottom(0);    //bottom margin eliminated because this is split
         if (dividedList.getHead() != null) {
             first.addAll(dividedList.getHead());
         }
@@ -698,6 +729,9 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
         // create tail sub frame
         Frame tail = new Frame(givenWidth, tailHeight);
         copyAllButInnerAndSizeTo(tail);
+        tail.setPaddingTop(0);   //top padding eliminated because this is split
+        tail.setMarginTop(0);    //top margin eliminated because this is split
+
         if (divided != null) {
             tail.add(divided.getTail());
         }

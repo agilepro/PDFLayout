@@ -59,7 +59,7 @@ public class ColumnLayout extends VerticalLayout {
     }
 
     @Override
-    public boolean render(RenderContext renderContext, Element element,
+    public boolean renderWithHint(RenderContext renderContext, Element element,
             LayoutHint layoutHint) throws Exception {
         if (element == ControlElement.NEWPAGE) {
             renderContext.newPage();
@@ -69,16 +69,16 @@ public class ColumnLayout extends VerticalLayout {
             turnPage(renderContext);
             return true;
         }
-        return super.render(renderContext, element, layoutHint);
+        return super.renderWithHint(renderContext, element, layoutHint);
     }
 
     @Override
-    public void render(RenderContext renderContext, Drawable drawable,
+    public void renderDrawable(RenderContext renderContext, Drawable drawable,
             LayoutHint layoutHint) throws Exception {
         if (offsetY == null) {
             offsetY = renderContext.getUpperLeft().getY() - renderContext.getCurrentPosition().getY();
         }
-        super.render(renderContext, drawable, layoutHint);
+        super.renderDrawable(renderContext, drawable, layoutHint);
     }
 
     @Override

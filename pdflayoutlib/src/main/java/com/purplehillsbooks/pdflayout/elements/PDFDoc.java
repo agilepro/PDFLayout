@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,7 +14,6 @@ import com.purplehillsbooks.pdflayout.elements.render.Layout;
 import com.purplehillsbooks.pdflayout.elements.render.LayoutHint;
 import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.elements.render.RenderListener;
-import com.purplehillsbooks.pdflayout.elements.render.Renderer;
 import com.purplehillsbooks.pdflayout.elements.render.VerticalLayout;
 import com.purplehillsbooks.pdflayout.elements.render.VerticalLayoutHint;
 
@@ -24,9 +22,9 @@ import com.purplehillsbooks.pdflayout.elements.render.VerticalLayoutHint;
  * and then fill it with Frames and Paragraphs.
  * </p>
  * <p>
- * The PDFDoc has a PageFormat object that specifies how the document will
- * be composed.  The Page has an overall dimensions, and then four margins:
- * left, right, top, and bottom.  
+ * The PDFDoc has a PageFormat object that specifies the size, orientation and 
+ * margins of the page.  The Page has an overall dimensions, and then four margins:
+ * left, right, top, and bottom.
  * </p>
  * <p>
  * All measures are in points which are defined here as 72 points/inch.
@@ -61,12 +59,13 @@ import com.purplehillsbooks.pdflayout.elements.render.VerticalLayoutHint;
 public class PDFDoc implements RenderListener {
 
     /**
-     * A4 portrait without margins.
+     * The default page format is LETTER size, portrait orientation, 
+     * with 1/2 inch margins on all sides
      */
     public final static PageFormat DEFAULT_PAGE_FORMAT = new PageFormat();
 
     private final List<Entry<Element, LayoutHint>> elements = new ArrayList<>();
-    private final List<Renderer> customRenderer = new CopyOnWriteArrayList<Renderer>();
+    //private final List<Renderer> customRenderer = new CopyOnWriteArrayList<Renderer>();
     private final List<RenderListener> renderListener = new CopyOnWriteArrayList<RenderListener>();
 
     private PDDocument pdDocument;
@@ -150,11 +149,11 @@ public class PDFDoc implements RenderListener {
     }
 
     /**
-     * Returns the {@link PDDocument} to be created by method {@link #render()}.
+     * Returns the {@link PDDocument} to be created by method {@link #renderDocument()}.
      * Beware that this PDDocument is released after rendering. This means each
      * rendering process creates a new PDDocument.
      *
-     * @return the PDDocument to be used on the next call to {@link #render()}.
+     * @return the PDDocument to be used on the next call to {@link #renderDocument()}.
      */
     public PDDocument getPDDocument() {
         if (pdDocument == null) {
@@ -175,7 +174,7 @@ public class PDFDoc implements RenderListener {
 
 
     /**
-     * Called after {@link #render()} in order to release the current document.
+     * Called after {@link #renderDocument()} in order to release the current document.
      */
     protected void resetPDDocument() {
         this.pdDocument = null;
@@ -190,11 +189,13 @@ public class PDFDoc implements RenderListener {
      * @param renderer
      *            the renderer to add.
      */
+    /* comment out until we have a test for this
     public void addRenderer(final Renderer renderer) {
         if (renderer != null) {
             customRenderer.add(renderer);
         }
     }
+    */
 
     /**
      * Removes a {@link Renderer} .
@@ -202,9 +203,12 @@ public class PDFDoc implements RenderListener {
      * @param renderer
      *            the renderer to remove.
      */
+
+    /* comment out until we have a test for this
     public void removeRenderer(final Renderer renderer) {
         customRenderer.remove(renderer);
     }
+    */
 
     /**
      * Renders all elements and returns the resulting {@link PDDocument}.
@@ -213,7 +217,7 @@ public class PDFDoc implements RenderListener {
      * @throws Exception
      *             by pdfbox
      */
-    public PDDocument render() throws Exception {
+    public PDDocument renderDocument() throws Exception {
         PDDocument document = getPDDocument();
         RenderContext renderContext = new RenderContext(this, document);
         for (Entry<Element, LayoutHint> entry : elements) {
@@ -222,17 +226,19 @@ public class PDFDoc implements RenderListener {
             boolean success = false;
 
             // first ask custom renderer to render the element
-            Iterator<Renderer> customRendererIterator = customRenderer
-                    .iterator();
+            
+
+            /* comment out until we have a test for this
+            Iterator<Renderer> customRendererIterator = customRenderer.iterator();
             while (!success && customRendererIterator.hasNext()) {
                 success = customRendererIterator.next().render(renderContext,
                         element, layoutHint);
             }
+            */
 
             // if none of them felt responsible, let the default renderer do the job.
             if (!success) {
-                success = renderContext.render(renderContext, element,
-                        layoutHint);
+                success = renderContext.startRendering(element, layoutHint);
             }
 
             if (!success) {
@@ -250,7 +256,7 @@ public class PDFDoc implements RenderListener {
     }
 
     /**
-     * {@link #render() Renders} the document and saves it to the given file.
+     * {@link #renderDocument() Renders} the document and saves it to the given file.
      *
      * @param file
      *            the file to save to.
@@ -258,13 +264,13 @@ public class PDFDoc implements RenderListener {
      *             by pdfbox
      */
     public void saveToFile(final File file) throws Exception {
-        try (OutputStream out = new FileOutputStream(file)) {
-            saveToStream(out);
-        }
+        OutputStream out = new FileOutputStream(file);
+        saveToStream(out);
+        out.close();
     }
 
     /**
-     * {@link #render() Renders} the document and saves it to the given output
+     * {@link #renderDocument() Renders} the document and saves it to the given output
      * stream.
      *
      * @param output
@@ -273,9 +279,10 @@ public class PDFDoc implements RenderListener {
      *             by pdfbox
      */
     public void saveToStream(final OutputStream output) throws Exception {
-        try (PDDocument document = render()) {
+        try (PDDocument document = renderDocument()) {
             try {
                 document.save(output);
+                output.flush();
             } 
             catch (Exception e) {
                 throw new Exception("Unable to save to output stream", e);
@@ -285,7 +292,7 @@ public class PDFDoc implements RenderListener {
 
     /**
      * Adds a {@link RenderListener} that will be notified during
-     * {@link #render() rendering}.
+     * {@link #renderDocument() rendering}.
      *
      * @param listener
      *            the listener to add.
@@ -307,8 +314,7 @@ public class PDFDoc implements RenderListener {
     }
 
     @Override
-    public void beforePage(final RenderContext renderContext)
-            throws Exception {
+    public void beforePage(final RenderContext renderContext) throws Exception {
         for (RenderListener listener : renderListener) {
             listener.beforePage(renderContext);
         }
