@@ -4,6 +4,7 @@ package com.purplehillsbooks.pdflayout.elements;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
 
@@ -28,8 +29,8 @@ public class Cutter implements Dividable, Drawable {
     }
 
     @Override
-    public Divided divide(float remainingHeight, final float pageHeight) {
-        return new Divided(new Cutter(undividable, viewPortY, remainingHeight),
+    public Divided divide(float remainingHeight, RenderContext renderContext, boolean topOfPage) {
+        return new Divided(new Cutter(undividable, viewPortY, renderContext.getHeight()),
                 new Cutter(undividable, viewPortY - remainingHeight,
                         viewPortHeight - remainingHeight));
     }

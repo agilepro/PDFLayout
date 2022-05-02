@@ -42,8 +42,12 @@ public class ColumnLayout extends VerticalLayout {
 
     /**
      * Flips to the next column
+     * 
+     * method in super class was removed, hever this might be needed
+     * comment above says this is to go to the next column !  if that is
+     * what this means might need to add this back in.
      */
-    @Override
+    //Override
     protected void turnPage(final RenderContext renderContext)
             throws Exception {
         if (++columnIndex >= columnCount) {
@@ -81,13 +85,5 @@ public class ColumnLayout extends VerticalLayout {
         super.renderDrawable(renderContext, drawable, layoutHint);
     }
 
-    @Override
-    protected boolean isPositionTopOfPage(final RenderContext renderContext) {
-        float topPosition = renderContext.getUpperLeft().getY();
-        if (offsetY != null) {
-            topPosition -= offsetY;
-        }
-        return renderContext.getCurrentPosition().getY() == topPosition;
-    }
 
 }

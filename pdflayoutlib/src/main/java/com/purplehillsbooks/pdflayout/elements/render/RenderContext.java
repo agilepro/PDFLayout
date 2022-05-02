@@ -31,7 +31,7 @@ public class RenderContext implements DrawContext, DrawListener {
 
     private final PDFDoc document;
     private final PDDocument pdDocument;
-    private PDPage page;
+    private PDPage currentPage;
     private int pageIndex = 0;
     private PDPageContentStream contentStream;
     private Position currentPosition;
@@ -100,6 +100,20 @@ public class RenderContext implements DrawContext, DrawListener {
     public Position getUpperLeft() {
         return new Position(getPageFormat().getMarginLeft(), getPageHeight()
                 - getPageFormat().getMarginTop());
+    }
+    
+    /**
+     * This is intended to test whether anything has been written to the 
+     * page so that rendering can treat things at the top of the page
+     * differently than those positions further down.  The assumption 
+     * is that every write will leave the position moved.  If there ever
+     * is a situation where writing does not move the position, then a 
+     * better test will be needed.
+     * 
+     * @return true if nothing written to the current page yet
+     */
+    public boolean isTopOfPage() {
+        return currentPosition.equals(getUpperLeft());
     }
 
     /**
@@ -182,8 +196,8 @@ public class RenderContext implements DrawContext, DrawListener {
      * @return <code>true</code> if the page is rotated by 90/270 degrees.
      */
     public boolean isPageTilted() {
-        return CompatibilityHelper.getPageRotation(page) == 90
-                || CompatibilityHelper.getPageRotation(page) == 270;
+        return CompatibilityHelper.getPageRotation(currentPage) == 90
+                || CompatibilityHelper.getPageRotation(currentPage) == 270;
     }
 
     /**
@@ -192,9 +206,9 @@ public class RenderContext implements DrawContext, DrawListener {
      */
     public float getPageWidth() {
         if (isPageTilted()) {
-            return page.getMediaBox().getHeight();
+            return currentPage.getMediaBox().getHeight();
         }
-        return page.getMediaBox().getWidth();
+        return currentPage.getMediaBox().getWidth();
     }
 
     /**
@@ -203,9 +217,9 @@ public class RenderContext implements DrawContext, DrawListener {
      */
     public float getPageHeight() {
         if (isPageTilted()) {
-            return page.getMediaBox().getWidth();
+            return currentPage.getMediaBox().getWidth();
         }
-        return page.getMediaBox().getHeight();
+        return currentPage.getMediaBox().getHeight();
     }
 
     /**
@@ -250,7 +264,7 @@ public class RenderContext implements DrawContext, DrawListener {
 
     @Override
     public PDPage getCurrentPage() {
-        return page;
+        return currentPage;
     }
 
     @Override
@@ -345,17 +359,17 @@ public class RenderContext implements DrawContext, DrawListener {
             setPageFormat(nextPageFormat);
         }
 
-        this.page = new PDPage(getPageFormat().getMediaBox());
-        this.pdDocument.addPage(page);
+        this.currentPage = new PDPage(getPageFormat().getMediaBox());
+        this.pdDocument.addPage(currentPage);
         this.contentStream = CompatibilityHelper
-                .createAppendablePDPageContentStream(pdDocument, page);
+                .createAppendablePDPageContentStream(pdDocument, currentPage);
 
         // fix orientation
         if (getPageOrientation() != getPageFormat().getOrientation()) {
             if (isPageTilted()) {
-                page.setRotation(0);
+                currentPage.setRotation(0);
             } else {
-                page.setRotation(90);
+                currentPage.setRotation(90);
             }
         }
 

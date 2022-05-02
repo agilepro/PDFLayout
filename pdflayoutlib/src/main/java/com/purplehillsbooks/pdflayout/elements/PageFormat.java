@@ -24,6 +24,7 @@ public class PageFormat implements Element {
      * Creates a PageFormat with A4 portrait with 1/2 inch margins on all sides
      */
     public PageFormat() {
+        //36 points is 1/2 inch
         this(PDRectangle.LETTER, Orientation.Portrait, 36, 36, 36, 36);
     }
 
@@ -39,7 +40,7 @@ public class PageFormat implements Element {
 
     /**
      * Creates a PageFormat with a given size and orientation.
-     * Margins are all zero.
+     * Margins are all 1/2 inch
      *
      * @param pageSize
      *            the size.
@@ -47,7 +48,7 @@ public class PageFormat implements Element {
      *            the orientation.
      */
     public PageFormat(final PDRectangle pageSize, final Orientation orientation) {
-        this(pageSize, orientation, 0, 0, 0, 0);
+        this(pageSize, orientation, 36, 36, 36, 36);
     }
 
     /**

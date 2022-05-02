@@ -4,6 +4,7 @@ package com.purplehillsbooks.pdflayout.elements;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
 
@@ -49,7 +50,7 @@ public class VerticalSpacer implements Drawable, Element, Dividable {
     }
 
     @Override
-    public Divided divide(float remainingHeight, final float pageHeight)
+    public Divided divide(float remainingHeight, RenderContext renderContext, boolean topOfPage)
             throws Exception {
         return new Divided(new VerticalSpacer(remainingHeight),
                 new VerticalSpacer(getHeight() - remainingHeight));

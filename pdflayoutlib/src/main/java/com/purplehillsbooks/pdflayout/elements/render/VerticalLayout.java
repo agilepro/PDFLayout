@@ -9,8 +9,8 @@ import com.purplehillsbooks.pdflayout.elements.Dividable;
 import com.purplehillsbooks.pdflayout.elements.Dividable.Divided;
 import com.purplehillsbooks.pdflayout.elements.Drawable;
 import com.purplehillsbooks.pdflayout.elements.Element;
+import com.purplehillsbooks.pdflayout.elements.Frame;
 import com.purplehillsbooks.pdflayout.elements.PageFormat;
-import com.purplehillsbooks.pdflayout.elements.VerticalSpacer;
 import com.purplehillsbooks.pdflayout.text.Alignment;
 import com.purplehillsbooks.pdflayout.text.Position;
 import com.purplehillsbooks.pdflayout.text.WidthRespecting;
@@ -48,18 +48,6 @@ public class VerticalLayout implements Layout {
         this.removeLeadingEmptyVerticalSpace = removeLeadingEmptyLines;
     }
 
-    /**
-     * Turns to the next area, usually a page.
-     *
-     * @param renderContext
-     *            the render context.
-     * @throws Exception
-     *             by pdfbox.
-     */
-    protected void turnPage(final RenderContext renderContext)
-            throws Exception {
-        renderContext.newPage();
-    }
 
     /**
      * @param renderContext
@@ -79,7 +67,7 @@ public class VerticalLayout implements Layout {
             return true;
         }
         if (element == ControlElement.NEWPAGE) {
-            turnPage(renderContext);
+            renderContext.newPage();
             return true;
         }
 
@@ -200,8 +188,24 @@ public class VerticalLayout implements Layout {
         }
 
         Drawable drawablePart = removeEmptySpaceIfTopOfPage(drawable, renderContext);
+        boolean topOfPage = renderContext.isTopOfPage();
+        float remainingHeight = renderContext.getRemainingHeight();
         
-        while (renderContext.getRemainingHeight() < drawablePart.getHeight()) {
+        if (drawablePart instanceof Frame) {
+            if (remainingHeight < ((Frame)drawablePart).getNeedSpace()
+                    || ((Frame)drawablePart).getStartNewPage()) {
+                //this one wants to jump to the next page
+                //so fill the rest of this page with white space.
+                //VerticalSpacer restOfPage = new VerticalSpacer(renderContext.getRemainingHeight());
+                //drawReletivePartAndMovePosition(renderContext, restOfPage,
+                //        layoutHint, true);
+                renderContext.newPage();
+                topOfPage = true;
+            }
+        }
+        
+        float thisPartHeight = drawablePart.getHeight();
+        while (remainingHeight < thisPartHeight) {
             Dividable dividable = null;
             if (drawablePart instanceof Dividable) {
                 dividable = (Dividable) drawablePart;
@@ -209,17 +213,20 @@ public class VerticalLayout implements Layout {
                 dividable = new Cutter(drawablePart);
             }
             Divided divided = dividable.divide(
-                    renderContext.getRemainingHeight(),
-                    renderContext.getHeight());
+                    renderContext.getRemainingHeight(), renderContext,
+                    topOfPage);
             drawReletivePartAndMovePosition(renderContext, divided.getFirst(),
                     layoutHint, true);
 
             // new page
-            turnPage(renderContext);
+            renderContext.newPage();
+            topOfPage = true;
+            remainingHeight = renderContext.getRemainingHeight();
 
             drawablePart = divided.getTail();
             drawablePart = removeEmptySpaceIfTopOfPage(drawablePart,
                     renderContext);
+            thisPartHeight = drawablePart.getHeight();
         }
 
         drawReletivePartAndMovePosition(renderContext, drawablePart,
@@ -293,17 +300,6 @@ public class VerticalLayout implements Layout {
         }
     }
 
-    /**
-     * Indicates if the current position is the top of page.
-     *
-     * @param renderContext
-     *            the render context.
-     * @return <code>true</code> if the current position is top of page.
-     */
-    protected boolean isPositionTopOfPage(final RenderContext renderContext) {
-        return renderContext.getCurrentPosition().getY() == renderContext
-                .getUpperLeft().getY();
-    }
 
     /**
      * Removes empty space (e.g. empty lines) at the begin of a page. See
@@ -320,7 +316,7 @@ public class VerticalLayout implements Layout {
     protected Drawable removeEmptySpaceIfTopOfPage(final Drawable drawable,
             final RenderContext renderContext) throws Exception {
         if (isRemoveLeadingEmptyVerticalSpace()
-                && isPositionTopOfPage(renderContext)) {
+                && renderContext.isTopOfPage()) {
             return drawable.removeLeadingEmptyVerticalSpace();
         }
         return drawable;

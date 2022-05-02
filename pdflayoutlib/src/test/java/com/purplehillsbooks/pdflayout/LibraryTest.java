@@ -36,13 +36,16 @@ public class LibraryTest {
         
         parseWords();
         
+        createDocumentFramesNeedSpace();
         createLongDocument1();
-        createLongDocument2();
+        createLongDocument2(false);
+        createLongDocument2(true);
         createLongDocument3();
         createLongDocument4();
         createDocumentDoubleFrames();
         createDocumentTripleFrames();
         createDocumentSmallFrames();
+        createDocumentFramesNewPage();
     }
     
     /**
@@ -65,11 +68,21 @@ public class LibraryTest {
         
     }
     
-    private void createLongDocument2() throws Exception {
+    private void createLongDocument2(boolean keepTogether) throws Exception {
         
         PDFDoc doc = new PDFDoc(50,50,50,50);
         doc.showMargins = true;
         Frame mainFrame = doc.newInteriorFrame();
+        
+        Paragraph instructions = mainFrame.getNewParagraph();
+        instructions.addText("This document has a lot of largish frames to see if breaking them "
+                +"across page boundaries is working. ", 12, PDType1Font.COURIER);
+        if (keepTogether) {
+            instructions.addText("Frames are NOT allowed to be split, and should be always kept together on a page.", 12, PDType1Font.COURIER);
+        }
+        else {
+            instructions.addText("Frames are allowed to be split. ", 12, PDType1Font.COURIER);
+        }
         
         for (int i=0; i<100; i++) {
             Frame innerFrame = mainFrame.newInteriorFrame();
@@ -80,6 +93,7 @@ public class LibraryTest {
             innerFrame.setBorderColor(thisColor);
             innerFrame.setMargin(15, 15, 15, 15);
             innerFrame.setPadding(15, 15, 15, 15);
+            innerFrame.setKeepTogether(keepTogether);
             String repeatedPara = generateParagraph(100);
             Paragraph para = innerFrame.getNewParagraph();
             para.addTextCarefully(repeatedPara, 12, PDType1Font.HELVETICA);
@@ -89,7 +103,7 @@ public class LibraryTest {
             para.addTextCarefully(repeatedPara, 12, PDType1Font.HELVETICA);
         }
         
-        File t1file = new File(testOutputFolder, "Test2-LongFrames.pdf");
+        File t1file = new File(testOutputFolder, "Test2-LongFrame"+ (keepTogether?"_NoSplit":"_Split") + ".pdf");
         doc.saveToFile(t1file);
         
     }
@@ -100,6 +114,11 @@ public class LibraryTest {
         PDFDoc doc = new PDFDoc(50,50,50,50);
         doc.showMargins = true;
         Frame mainFrame = doc.newInteriorFrame();
+        
+        Paragraph instructions = mainFrame.getNewParagraph();
+        instructions.addText("This document has a lot of frames to see if breaking them "
+                +"across page boundaries is working. ", 12, PDType1Font.TIMES_BOLD);
+        
         
         for (int i=0; i<200; i++) {
             Frame innerFrame = mainFrame.newInteriorFrame();
@@ -223,6 +242,71 @@ public class LibraryTest {
         }
         
         File t1file = new File(testOutputFolder, "Test7-SmallFrames.pdf");
+        doc.saveToFile(t1file);
+        
+    }
+    private void createDocumentFramesNewPage() throws Exception {
+        
+        PDFDoc doc = new PDFDoc(50,50,50,50);
+        doc.showMargins = true;
+        Frame mainFrame = doc.newInteriorFrame();
+        
+        for (int i=0; i<200; i++) {
+            Frame innerFrame = mainFrame.newInteriorFrame();
+            Color thisColor = Color.blue;
+            if (i % 2 == 0) {
+                thisColor = Color.green;
+            }
+            innerFrame.setBorderColor(thisColor);
+            innerFrame.setMargin(15, 15, 15, 15);
+            innerFrame.setPadding(15, 15, 15, 15);
+            Paragraph para = innerFrame.getNewParagraph();
+            para.setSpaceAfter(0);
+            para.setSpaceBefore(0);
+            if (r.nextInt(6)==0) {
+                innerFrame.setStartNewPage(true);
+                innerFrame.setBackgroundColor(Color.yellow);
+                para.addTextCarefully("This frame should always be at top of new page", 12, PDType1Font.HELVETICA);
+            }
+            else {
+                para.addTextCarefully("Just one line of text, usually not at top of page", 12, PDType1Font.HELVETICA);
+            }
+        }
+        
+        File t1file = new File(testOutputFolder, "Test8-NewPage.pdf");
+        doc.saveToFile(t1file);
+        
+    }
+    
+    private void createDocumentFramesNeedSpace() throws Exception {
+        
+        PDFDoc doc = new PDFDoc(50,50,50,50);
+        doc.showMargins = true;
+        Frame mainFrame = doc.newInteriorFrame();
+        
+        for (int i=0; i<200; i++) {
+            Frame innerFrame = mainFrame.newInteriorFrame();
+            Color thisColor = Color.blue;
+            if (i % 2 == 0) {
+                thisColor = Color.green;
+            }
+            innerFrame.setBorderColor(thisColor);
+            innerFrame.setMargin(5, 5, 5, 5);
+            innerFrame.setPadding(5, 5, 5, 5);
+            Paragraph para = innerFrame.getNewParagraph();
+            para.setSpaceAfter(0);
+            para.setSpaceBefore(0);
+            if (r.nextInt(6)==0) {
+                innerFrame.setNeedSpace(216);
+                innerFrame.setBackgroundColor(Color.yellow);
+                para.addTextCarefully("This frame should never be seen less than 3 inch from bottom, "+i, 12, PDType1Font.HELVETICA);
+            }
+            else {
+                para.addTextCarefully("Just one line of text, nothing special, "+i, 12, PDType1Font.HELVETICA);
+            }
+        }
+        
+        File t1file = new File(testOutputFolder, "Test9-NeedSpace.pdf");
         doc.saveToFile(t1file);
         
     }

@@ -20,6 +20,8 @@ Here is a sample code:
         for ( <--each paragraph you have--> ) {
             Paragraph para = innerFrame.getNewParagraph();
             para.addTextCarefully(<para-text>, 12, PDType1Font.HELVETICA);
+            para.addTextCarefully(<more-text>, 12, PDType1Font.HELVETICA);
+            para.addTextCarefully(<more-text>, 12, PDType1Font.HELVETICA);
         }
     }
     
@@ -61,6 +63,11 @@ top margin.
 
 Paragraphs hold a list of text fragments, each can be styled with a different font/size.
 Word-wrap will then flow all these text fragments into a single paragraph.
+
+The addTextCarefully checks each Unicode code point to see if the font supports it, and replaces
+the charater with a "?" if not supported by font.  Unfortunately the default behavior of 
+PDFBox is that characters missing from the font throw an exception stopping all layout and
+preventing all results.  
 
 Paragraphs can have some white space before and after them which provides space between 
 paragraphs.  Set the spaceBefore and spaceAfter to zero to disable this.  

@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
 import com.purplehillsbooks.pdflayout.text.WidthRespecting;
@@ -92,12 +93,12 @@ public class ImageElement implements Element, Drawable, Dividable,
     }
 
     @Override
-    public Divided divide(float remainingHeight, float nextPageHeight)
+    public Divided divide(float remainingHeight, RenderContext renderContext, boolean topOfPage)
             throws Exception {
-        if (getHeight() <= nextPageHeight) {
+        if (getHeight() <= renderContext.getHeight()) {
             return new Divided(new VerticalSpacer(remainingHeight), this);
         }
-        return new Cutter(this).divide(remainingHeight, nextPageHeight);
+        return new Cutter(this).divide(remainingHeight, renderContext, topOfPage);
     }
 
     @Override

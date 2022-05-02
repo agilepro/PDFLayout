@@ -1,6 +1,7 @@
 package com.purplehillsbooks.pdflayout.elements;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -8,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.shape.Rect;
 import com.purplehillsbooks.pdflayout.shape.Shape;
 import com.purplehillsbooks.pdflayout.shape.Stroke;
@@ -101,6 +103,10 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
 
     private float givenWidth = 0;
     private float givenHeight = 0;
+    private boolean startNewPage = false;
+    private boolean keepTogether = false;
+    private float needSpace = 0;
+    
 
     private Position absolutePosition;
 
@@ -617,6 +623,59 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
             }
         }
     }
+    
+    /**
+     * Setting StartNewPage causes a page-break before this frame is processed
+     * causing this frame to appear as the first thing on a new page.
+     * By default a frame will not create a new page.
+     * 
+     * @param val Passing a 'true' value sets the frame to be on a new page
+     *     Passing 'false' turns this off and allow the frame to be placed
+     *     immediately after the previous frame (if there is room)
+     */
+    public void setStartNewPage(boolean val) {
+        startNewPage = val;
+    }
+    public boolean getStartNewPage() {
+        return startNewPage;
+    }
+    
+    /**
+     * setting KeepTogether causes the formatted height of the frame to 
+     * be considered.  If the entire frame can fit on the current page
+     * at the current position it will be placed there.  But if the current
+     * position is too close to the bottom of the page, then the entire frame
+     * will be moved to the next page.
+     * 
+     * @param val Passing a 'true' value sets so that the frame will always
+     *     be kept together
+     */
+    public void setKeepTogether(boolean val) {
+        keepTogether = val;
+    }
+    public boolean getKeepTogether() {
+        return keepTogether;
+    }
+
+    
+    /**
+     * A frame can be set to require a certain amount of space.  If there is 
+     * less than that amount of space on the page, then the frame will be moved
+     * to the next page.   The space being reserved is not white space, but actually
+     * space for the contents of this frame plus potentially other frames and paragraphs.
+     * This does not depend on the size of the frame.  It simply allows you to 
+     * prevent a frame from appearing at the bottom of the page, and if too close
+     * to the bottom, appear on the next page instead.
+     * 
+     * @param val the measure in points that you would like to reserve for this frame
+     *    and subsequent frames.
+     */
+    public void setNeedSpace(float val) {
+        needSpace = val;
+    }
+    public float getNeedSpace() {
+        return needSpace;
+    }
 
 
     /**
@@ -681,20 +740,41 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     }
 
     @Override
-    public Divided divide(float remainingHeight, float nextPageHeight) throws Exception {
+    public Divided divide(float remainingHeight, RenderContext renderContext, boolean topOfPage) throws Exception {
         propagateMaxWidthToChildren();
+        
+        float fullHeight = getHeight();
+        float nextPageHeight = renderContext.getHeight();
 
-        if (remainingHeight <= getLeadingWhiteSpace()) {
-            // in this case, the "overhead" space of the frame is more than the remaining
-            // space, so just move the entire frame to the next page, and fill this page
+        if (startNewPage || remainingHeight<needSpace  || remainingHeight <= getLeadingWhiteSpace() 
+                || (keepTogether && remainingHeight<fullHeight && fullHeight<nextPageHeight)) {
+            // in all these cases, fill the rest of the page with white space, and move to new page.
+            // either:
+            //   1. frame is marked as start new page, causing a new page break
+            //   2. frame requires some space, but that space is not available
+            //   3. not enough room for even just the margin/padding of the frame.
+            //   4. frame marked keepTogether and there is not enough room on this page, 
+            //      but there is enough room on the following page (avoid infinite loops)
+            // so just move the entire frame to the next page, and fill this page
             // with white vertical space.
-            return new Divided(new VerticalSpacer(remainingHeight), this);
+            if (!topOfPage) {
+                //only do this if not already at the top of the page.  If the page is 
+                //clean (empty) then there is no benefit in moving to the next page
+                return new Divided(new VerticalSpacer(remainingHeight), this);
+            }
         }
 
         // we have to account for the extra white space at the top of the frame
         float spaceLeft = remainingHeight - getMarginTop() - getPaddingTop();
 
-        DividedList dividedList = divideList(innerList, spaceLeft);
+        DividedList dividedList = divideList(innerList, spaceLeft, renderContext, topOfPage);
+        
+        List<Drawable> headList = dividedList.getHead();
+        if (headList.size()>0) {
+            //the element being divided below is not at the top of the page if
+            //there is anything in head list before it on this page
+            topOfPage = false;
+        }
 
         float spaceLeftForDivided = spaceLeft - getHeight(dividedList.getHead());
         Divided divided = null;
@@ -707,8 +787,7 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
                 innerDividable = new Cutter(dividedList.getDrawableToDivide());
             }
             // some space left on this page for the inner element
-            divided = innerDividable.divide(spaceLeftForDivided, nextPageHeight
-                    - getVerticalExtraSpace());
+            divided = innerDividable.divide(spaceLeftForDivided, renderContext, topOfPage);
         }
 
         Float firstHeight = givenHeight<=0 ? 0 : remainingHeight;
@@ -742,34 +821,60 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
         return new Divided(first, tail);
     }
 
-    private DividedList divideList(List<Drawable> items, float spaceLeft)
+    private DividedList divideList(List<Drawable> items, float spaceLeft, RenderContext renderContext, boolean topOfPage)
             throws Exception {
-        List<Drawable> head = null;
+        List<Drawable> head = new ArrayList<Drawable>();
         List<Drawable> tail = null;
         Drawable toDivide = null;
 
         float tmpHeight = 0;
         int index = 0;
         while (tmpHeight < spaceLeft && index<items.size()) {
-            tmpHeight += items.get(index).getHeight();
-
-            if (tmpHeight == spaceLeft) {
-                // we can split between two drawables
-                head = items.subList(0, index + 1);
-                if (index + 1 < items.size()) {
-                    tail = items.subList(index + 1, items.size());
+            Drawable drawMe = items.get(index);
+            float    fullHeight = drawMe.getHeight();
+            
+            if (!topOfPage && drawMe instanceof Frame) {
+                Frame drawMeFrame = (Frame)drawMe;
+                if (drawMeFrame.getStartNewPage() || spaceLeft-tmpHeight<drawMeFrame.getNeedSpace()) {
+                    //force it to take up more than the rest of the page so it 
+                    //gets moved or split.  Don't move if topOfPage already
+                    head.add(new VerticalSpacer(fullHeight-tmpHeight));
+                    tmpHeight = spaceLeft;
+                    break;  //avoid including this in the set
                 }
             }
 
-            if (tmpHeight > spaceLeft) {
-                head = items.subList(0, index);
-                toDivide = items.get(index);
-                if (index + 1 < items.size()) {
-                    tail = items.subList(index + 1, items.size());
-                }
+            if (fullHeight + tmpHeight > spaceLeft) {
+                break;
             }
-
+            
+            head.add(drawMe);
             ++index;
+            tmpHeight += fullHeight;
+            topOfPage = false;
+        }
+        
+        if (tmpHeight == spaceLeft) {
+            // page is filled perfectly, so we can split between two drawables
+            // and leave the toDivide null
+
+            if (index < items.size()) {
+                tail = items.subList(index, items.size());
+            }
+            else {
+                tail = new ArrayList<Drawable>();
+            }
+        }
+        else {
+            if (index < items.size()) {
+                toDivide = items.get(index);
+            }
+            if (index + 1 < items.size()) {
+                tail = items.subList(index + 1, items.size());
+            }
+            else {
+                tail = new ArrayList<Drawable>();
+            }
         }
 
         return new DividedList(head, toDivide, tail);

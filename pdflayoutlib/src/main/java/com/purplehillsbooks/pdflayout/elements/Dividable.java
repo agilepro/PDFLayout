@@ -1,5 +1,7 @@
 package com.purplehillsbooks.pdflayout.elements;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
+
 /**
  * If a drawable is marked as {@link Dividable}, it can be (vertically) divided
  * in case it does not fit on the (remaining) page.
@@ -21,7 +23,7 @@ public interface Dividable {
      * @return the Divided containing the first part and the tail.
      * @throws Exception by pdfbox.
      */
-    Divided divide(final float remainingHeight, final float nextPageHeight)
+    Divided divide(final float remainingHeight, RenderContext renderContext, boolean topOfPage)
             throws Exception;
 
     /**
