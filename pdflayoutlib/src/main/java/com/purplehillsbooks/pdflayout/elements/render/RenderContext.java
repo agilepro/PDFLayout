@@ -445,9 +445,9 @@ public class RenderContext implements DrawContext, DrawListener {
 
     /**
      * Updates the maximum right resp. bottom position on the page.
-     * @param upperLeft
-     * @param width
-     * @param height
+     * @param upperLeft obvious
+     * @param width obvious
+     * @param height obvious
      */
     protected void updateMaxPositionOnPage(Position upperLeft, float width,
             float height) {

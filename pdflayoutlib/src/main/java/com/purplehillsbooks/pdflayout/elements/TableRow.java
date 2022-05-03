@@ -12,8 +12,8 @@ import com.purplehillsbooks.pdflayout.text.Position;
 
 /**
  * <p>A TableRow has a set of Frames, one for each column.
- * Construct a TableRow with a TableDefinition object.
- * Be sure to initialize the TableDefinition object before creating
+ * Construct a TableRow with a Table object.
+ * Be sure to initialize the Table object before creating
  * the TableRow so that the row is initialized with the right number
  * of cells.
  * 

@@ -20,11 +20,15 @@ public abstract class Drawable extends Element {
 
     /**
      * @return the width of the drawable in points
+     * 
+     * @throws Exception (forced javadoc text)
      */
     public abstract float getWidth() throws Exception;
 
     /**
      * @return the height of the drawable in points
+     * 
+     * @throws Exception (forced javadoc text)
      */
     public abstract float getHeight() throws Exception;
 
@@ -51,8 +55,7 @@ public abstract class Drawable extends Element {
      *            the listener to
      *            {@link DrawListener#drawn(Object, Position, float, float) notify} on
      *            drawn objects.
-     * @throws Exception
-     *             by pdfbox
+     * @throws Exception (forced javadoc nonsense)
      */
     public abstract void draw(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, DrawListener drawListener) throws Exception;
@@ -60,6 +63,8 @@ public abstract class Drawable extends Element {
     /**
      * Remove any setting that would cause white space before the content.
      *         This is useful for avoiding leading empty space on a new page.
+     * 
+     * @throws Exception (forced javadoc text)
      */
     public void removeLeadingEmptyVerticalSpace() throws Exception {
         //by default do nothing

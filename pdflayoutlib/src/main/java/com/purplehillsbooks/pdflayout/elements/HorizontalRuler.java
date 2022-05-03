@@ -73,7 +73,8 @@ public class HorizontalRuler extends Drawable implements WidthRespecting {
             getStroke().applyTo(contentStream);
             float x = upperLeft.getX();
             float y = upperLeft.getY() - getStroke().getLineWidth() / 2;
-            contentStream.addLine(x, y, x + getWidth(), y);
+            contentStream.moveTo(x, y);
+            contentStream.lineTo(x + getWidth(), y);
             contentStream.stroke();
         }
         if (drawListener != null) {

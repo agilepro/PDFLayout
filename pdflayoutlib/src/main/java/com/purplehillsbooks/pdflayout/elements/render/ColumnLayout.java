@@ -46,8 +46,11 @@ public class ColumnLayout extends VerticalLayout {
      * method in super class was removed, hever this might be needed
      * comment above says this is to go to the next column !  if that is
      * what this means might need to add this back in.
+     * 
+     * @param renderContext obvious
+     * 
+     * @throws Exception (javadoc required nonsense)
      */
-    //Override
     protected void turnPage(final RenderContext renderContext)
             throws Exception {
         if (++columnIndex >= columnCount) {

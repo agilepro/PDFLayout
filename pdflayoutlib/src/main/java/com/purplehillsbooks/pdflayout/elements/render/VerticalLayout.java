@@ -4,7 +4,6 @@ package com.purplehillsbooks.pdflayout.elements.render;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import com.purplehillsbooks.pdflayout.elements.ControlElement;
-import com.purplehillsbooks.pdflayout.elements.Cutter;
 import com.purplehillsbooks.pdflayout.elements.Dividable;
 import com.purplehillsbooks.pdflayout.elements.Dividable.Divided;
 import com.purplehillsbooks.pdflayout.elements.Drawable;
@@ -300,7 +299,7 @@ public class VerticalLayout extends Layout {
         }
     }
 
-
+    @SuppressWarnings("javadoc")
     /**
      * Removes empty space (e.g. empty lines) at the begin of a page. See
      * {@link Drawable#removeLeadingEmptyVerticalSpace()}
@@ -309,9 +308,6 @@ public class VerticalLayout extends Layout {
      *            the drawable to process.
      * @param renderContext
      *            the render context.
-     * @return the processed drawable
-     * @throws Exception
-     *             by pdfbox
      */
     protected void removeEmptySpaceIfTopOfPage(final Drawable drawable,
             final RenderContext renderContext) throws Exception {

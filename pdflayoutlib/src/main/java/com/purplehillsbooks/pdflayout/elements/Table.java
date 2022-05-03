@@ -27,7 +27,7 @@ import com.purplehillsbooks.pdflayout.text.Position;
  * Java lists.
  * </p>
  * <p>
- * Set up all the columns before you create TableRow objects.  This allos the rows
+ * Set up all the columns before you create TableRow objects.  This allows the rows
  * to be initialized correctly.
  * </p>
  * 
@@ -74,9 +74,8 @@ public class Table extends Dividable {
     }
     
     /**
-     * Rows are zero based, so the first row is 0, etc.
-     * @param rowNumber
-     * @return
+     * @param rowNumber Rows are zero based, so the first row is 0, etc.
+     * @return TableRow already existing retrieved from the list in the table
      */
     public TableRow getRow(int rowNumber) {
         return rows.get(rowNumber);
@@ -85,6 +84,9 @@ public class Table extends Dividable {
         rows.add(newRow);
     }
     
+    /**
+     * @return newly created TableRow which has also been added to the table
+     */
     public TableRow createNewRow() {
         TableRow newRow = new TableRow(this);
         rows.add(newRow);
@@ -113,10 +115,8 @@ public class Table extends Dividable {
             DrawListener drawListener) throws Exception {
         Position position = upperLeft;
         for (TableRow tr : rows) {
-            float heightBefore = tr.getHeight();
             contentStream.moveTo(position.getX(), position.getY());
             tr.draw(pdDocument, contentStream, position, drawListener);
-            float heightAfter = tr.getHeight();
             position = position.add(0, -tr.getHeight());
             contentStream.moveTo(position.getX(), position.getY());
         }

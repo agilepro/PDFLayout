@@ -54,10 +54,16 @@ public class Paragraph extends Dividable implements WidthRespecting  {
      * Adopts the TextFlow object directly, so be careful.
      * Otherwise, you can construct an empty paragraph, and then
      * insert the text.
+     * 
+     * @param contents the text inside the paragraph
      */
     public Paragraph(TextFlow contents) {
         paragraphText = contents;
     }
+    /**
+     * construct a paragraph without any text in it
+     * 
+     */
     public Paragraph() {
         paragraphText = new TextFlow();
     }

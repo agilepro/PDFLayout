@@ -169,10 +169,10 @@ public class Frame extends Dividable implements WidthRespecting {
      * plus border width, but not the margin.
      *
      * @param width
-     *            the width to constrain the border-box of the frame to, or
+     *            the width in points to constrain the border-box of the frame, or
      *            <code>null</code>.
      * @param height
-     *            the height to constrain the border-box of the frame to, or
+     *            the height in points to constrain the border-box of the frame, or
      *            <code>null</code>.
      */
     public Frame(final float width, final float height) {
@@ -182,7 +182,7 @@ public class Frame extends Dividable implements WidthRespecting {
 
     /**
      * Adds a drawable to the frame.
-     * @param drawable
+     * @param drawable Drawable object to add
      */
     public void add(final Drawable drawable) {
         innerList.add(drawable);
@@ -902,7 +902,7 @@ public class Frame extends Dividable implements WidthRespecting {
     }
     
     /**
-     * Returns a frame that would be inside this frame.   If this frame has a set
+     * @return a frame that would be inside this frame.   If this frame has a set
      * width or height, then the interior frame is set to a width enough smaller that it will
      * fit including margin and padding.   If width and height not set, then new frame has no
      * given width/height which means it will be just larger than whatever it contains.
@@ -929,6 +929,8 @@ public class Frame extends Dividable implements WidthRespecting {
     
     /**
      * Creates a new Paragraph, adds it to this frame, and returns it.
+     * 
+     * @return new paragraph (obviously)
      */
     public Paragraph getNewParagraph()  {
         Paragraph para = new Paragraph();
