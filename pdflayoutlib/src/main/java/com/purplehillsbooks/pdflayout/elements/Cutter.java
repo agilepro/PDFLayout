@@ -12,7 +12,7 @@ import com.purplehillsbooks.pdflayout.text.Position;
  * A cutter transforms any Drawable element into a {@link Dividable}. It simply
  * <em>cuts</em> the drawable vertically into pieces matching the target height.
  */
-public class Cutter implements Dividable, Drawable {
+public class Cutter extends Dividable {
 
     private final Drawable undividable;
     private final float viewPortY;
@@ -58,8 +58,8 @@ public class Cutter implements Dividable, Drawable {
     }
 
     @Override
-    public Drawable removeLeadingEmptyVerticalSpace() throws Exception {
-        return new Cutter(undividable.removeLeadingEmptyVerticalSpace());
+    public void removeLeadingEmptyVerticalSpace() throws Exception {
+        undividable.removeLeadingEmptyVerticalSpace();
     }
 
 }

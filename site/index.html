@@ -29,10 +29,17 @@ good PDF documents.</p>
 <li>PDFDoc object represents the main document, which contains Frames, which can themselves contain more Frames and ultimately Paragraphs that contain text.</li>
 <li>Fully page width frames supported</li>
 <li>Addressed some bugs around empty paragraph objects</li>
-<li>added programmable space before and after paragraphs<li>
+<li>added programmable space before and after paragraphs</li>
+<li>Added settings on Frame to allow:
+    <ul>
+    <li>keeping an entire frame together</li>
+    <li>forcing a pagebreak before a frame</li>
+    <li>setting a minimum space to reserve at bottom of page, forcing page break if too close to the bottom</li>
+    </ul>
+</li>
 </ul>
 
-<p>the first release.  This library is based on <a href="">pdfbox-layout</a> by Ralf Stuckert and his implementation of the basic frames, paragraphs, and the wordwrap and layout have worked essentially flawlessly.  But I had to fork a new version for a couple of reasons: It was not protecting against characters not in the font, I needed space before and after paragraphs, I need to implement bullet points, and I needed frames that would extend across the page.  The code I was integrating this into worked in a way that was not quite compatible to the interface provided.  Since then, I have extended the library extensively, but of course, make all the source freely available on GitHub.</p>
+<p>the first release.  This library is based on <a href="https://github.com/ralfstuckert/pdfbox-layout">pdfbox-layout</a> by Ralf Stuckert and his implementation of the basic frames, paragraphs, and the wordwrap and layout have worked essentially flawlessly.  But I had to fork a new version for a couple of reasons: It was not protecting against characters not in the font, I needed space before and after paragraphs, I need to implement bullet points, and I needed frames that would extend across the page, I need ability to force a pagebreak before a frame (without inserting a separate element) and ability to control keep-together on a frame, and keep-with-next minimum space capability.  The code I was integrating this into worked in a way that was not quite compatible to the interface provided.  Since then, I have extended the library extensively, but of course, make all the source freely available on GitHub.</p>
 
 
 </div>

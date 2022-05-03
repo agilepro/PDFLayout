@@ -6,7 +6,7 @@ import com.purplehillsbooks.pdflayout.elements.Element;
  * A layout is used to size and position the elements of a document according to
  * a specific strategy.
  */
-public interface Layout extends Element, Renderer {
+public abstract class Layout extends Element implements Renderer {
 
     
     // from Renderer you get:

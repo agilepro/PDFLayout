@@ -14,7 +14,7 @@ import com.purplehillsbooks.pdflayout.text.WidthRespecting;
  * A horizontal ruler that adjust its width to the given
  * {@link WidthRespecting#getMaxWidth() max width}.
  */
-public class HorizontalRuler implements Drawable, Element, WidthRespecting {
+public class HorizontalRuler extends Drawable implements WidthRespecting {
 
     private Stroke stroke;
     private Color color;
@@ -64,11 +64,6 @@ public class HorizontalRuler implements Drawable, Element, WidthRespecting {
     }
 
     @Override
-    public Position getAbsolutePosition() {
-        return null;
-    }
-
-    @Override
     public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, DrawListener drawListener) throws Exception {
         if (getColor() != null) {
@@ -86,9 +81,5 @@ public class HorizontalRuler implements Drawable, Element, WidthRespecting {
         }
     }
 
-    @Override
-    public Drawable removeLeadingEmptyVerticalSpace() {
-        return this;
-    }
 
 }

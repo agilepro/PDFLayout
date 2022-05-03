@@ -13,10 +13,11 @@ Here is a sample code:
     for ( <--each section you want--> ) {
         Frame innerFrame = doc.newInteriorFrame();
         
-        //make a section title
-        Paragraph para = innerInnerFrame.getNewParagraph();
+        //make a section title with a style like a header style
+        Paragraph para = innerFrame.getNewParagraph();
         para.addTextCarefully(<section-title>, 18, PDType1Font.HELVETICA);
         
+        //now add all the paragraphs as needed
         for ( <--each paragraph you have--> ) {
             Paragraph para = innerFrame.getNewParagraph();
             para.addTextCarefully(<para-text>, 12, PDType1Font.HELVETICA);
@@ -25,7 +26,7 @@ Here is a sample code:
         }
     }
     
-    File t1file = new File(testOutputFolder, "Test5-DoubleFrames.pdf");
+    File t1file = new File(destinationFolder, "CompleteDocument.pdf");
     doc.saveToFile(t1file);
 ```
 

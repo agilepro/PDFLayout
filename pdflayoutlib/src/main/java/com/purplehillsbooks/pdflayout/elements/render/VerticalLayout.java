@@ -22,7 +22,7 @@ import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
  * {@link Dividable divided}. Any given {@link VerticalLayoutHint} will be taken
  * into account to calculate the position, width, alignment etc.
  */
-public class VerticalLayout implements Layout {
+public class VerticalLayout extends Layout {
 
     protected boolean removeLeadingEmptyVerticalSpace = true;
 
@@ -122,6 +122,8 @@ public class VerticalLayout implements Layout {
     protected void renderReleative(final RenderContext renderContext,
             Drawable drawable, final LayoutHint layoutHint) throws Exception {
         
+        drawable.propagateMaxWidthToChildren();
+
         /*
         VerticalLayoutHint verticalLayoutHint = null;
         if (layoutHint instanceof VerticalLayoutHint) {
@@ -187,7 +189,8 @@ public class VerticalLayout implements Layout {
             }
         }
 
-        Drawable drawablePart = removeEmptySpaceIfTopOfPage(drawable, renderContext);
+        removeEmptySpaceIfTopOfPage(drawable, renderContext);
+        Drawable drawablePart = drawable;
         boolean topOfPage = renderContext.isTopOfPage();
         float remainingHeight = renderContext.getRemainingHeight();
         
@@ -206,26 +209,23 @@ public class VerticalLayout implements Layout {
         
         float thisPartHeight = drawablePart.getHeight();
         while (remainingHeight < thisPartHeight) {
-            Dividable dividable = null;
-            if (drawablePart instanceof Dividable) {
-                dividable = (Dividable) drawablePart;
-            } else {
-                dividable = new Cutter(drawablePart);
+            if (drawablePart.canBeDivided()) {
+                Dividable dividable = (Dividable) drawablePart;
+                Divided divided = dividable.divide(
+                        renderContext.getRemainingHeight(), renderContext, topOfPage);
+                divided.getFirst().trimTrailingWhiteSpace();
+                drawReletivePartAndMovePosition(renderContext, divided.getFirst(),
+                        layoutHint, true);
+                drawablePart = divided.getTail();
             }
-            Divided divided = dividable.divide(
-                    renderContext.getRemainingHeight(), renderContext,
-                    topOfPage);
-            drawReletivePartAndMovePosition(renderContext, divided.getFirst(),
-                    layoutHint, true);
 
             // new page
             renderContext.newPage();
             topOfPage = true;
             remainingHeight = renderContext.getRemainingHeight();
 
-            drawablePart = divided.getTail();
-            drawablePart = removeEmptySpaceIfTopOfPage(drawablePart,
-                    renderContext);
+            
+            removeEmptySpaceIfTopOfPage(drawablePart, renderContext);
             thisPartHeight = drawablePart.getHeight();
         }
 
@@ -313,13 +313,12 @@ public class VerticalLayout implements Layout {
      * @throws Exception
      *             by pdfbox
      */
-    protected Drawable removeEmptySpaceIfTopOfPage(final Drawable drawable,
+    protected void removeEmptySpaceIfTopOfPage(final Drawable drawable,
             final RenderContext renderContext) throws Exception {
         if (isRemoveLeadingEmptyVerticalSpace()
                 && renderContext.isTopOfPage()) {
-            return drawable.removeLeadingEmptyVerticalSpace();
+            drawable.removeLeadingEmptyVerticalSpace();
         }
-        return drawable;
     }
 
 }

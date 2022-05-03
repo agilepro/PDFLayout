@@ -12,7 +12,9 @@ import com.purplehillsbooks.pdflayout.text.Alignment;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
 import com.purplehillsbooks.pdflayout.text.TextFlow;
+import com.purplehillsbooks.pdflayout.text.TextFragment;
 import com.purplehillsbooks.pdflayout.text.TextLine;
+import com.purplehillsbooks.pdflayout.text.TextSequence;
 import com.purplehillsbooks.pdflayout.text.TextSequenceUtil;
 import com.purplehillsbooks.pdflayout.text.WidthRespecting;
 
@@ -38,13 +40,28 @@ import com.purplehillsbooks.pdflayout.text.WidthRespecting;
  * height either, since this is determined by the amount of text.
  * </p>
  */
-public class Paragraph extends TextFlow implements Drawable, Element,
-        WidthRespecting, Dividable {
+public class Paragraph extends Dividable implements WidthRespecting  {
 
     private Position absolutePosition;
     private Alignment alignment = Alignment.Left;
     private float spaceBefore = 6;
     private float spaceAfter  = 6;
+    
+    private TextFlow paragraphText;
+    
+    /**
+     * construct a paragraph when you already have the text for it.
+     * Adopts the TextFlow object directly, so be careful.
+     * Otherwise, you can construct an empty paragraph, and then
+     * insert the text.
+     */
+    public Paragraph(TextFlow contents) {
+        paragraphText = contents;
+    }
+    public Paragraph() {
+        paragraphText = new TextFlow();
+    }
+    
 
     @Override
     public Position getAbsolutePosition() {
@@ -53,11 +70,11 @@ public class Paragraph extends TextFlow implements Drawable, Element,
 
     @Override
     public float getHeight() throws Exception {
-        if (isEmpty()) {
+        if (paragraphText.isEmpty()) {
             //if empty, completely ignore this paragraph
             return 0;
         }
-        float textHeight = super.getHeight();
+        float textHeight = paragraphText.getHeight();
         return textHeight + spaceBefore + spaceAfter;
     }
     
@@ -101,18 +118,32 @@ public class Paragraph extends TextFlow implements Drawable, Element,
     public void setAlignment(Alignment alignment) {
         this.alignment = alignment;
     }
+    
+
+    public void setLineSpacing(float lineSpacing) {
+        paragraphText.setLineSpacing(lineSpacing);
+    }
+    public void setApplyLineSpacingToFirstLine(boolean applyLineSpacingToFirstLine) {
+        paragraphText.setApplyLineSpacingToFirstLine(applyLineSpacingToFirstLine);
+    }
+    public void add(final TextSequence sequence) {
+        paragraphText.add(sequence);
+    }
+    public void add(final TextFragment fragment) {
+        paragraphText.add(fragment);
+    }
 
     @Override
     public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, DrawListener drawListener) throws Exception {
-        if (isEmpty()) {
+        if (paragraphText.isEmpty()) {
             //if the paragraph has absolutely no text in it, then ignore it
             //so there is no extra white space or anything.
             return;
         }
         //we need to move the paragraph down by the amount of spaceBefore
         Position spacedPosition = upperLeft.add(0, -spaceBefore);
-        drawText(contentStream, spacedPosition, getAlignment(), drawListener );
+        paragraphText.drawText(contentStream, spacedPosition, getAlignment(), drawListener );
         
         //for debug make a rectangle
         /*
@@ -135,23 +166,23 @@ public class Paragraph extends TextFlow implements Drawable, Element,
     public Divided divide(float remainingHeight, RenderContext renderContext, boolean topOfPage) throws Exception {
         final float maxWidth = getMaxWidth();
         final float maxHeight = remainingHeight;
-        TextFlow wrapped = TextSequenceUtil.wordWrap(this, maxWidth);
+        TextFlow wrapped = TextSequenceUtil.wordWrap(paragraphText, maxWidth);
         List<TextLine> lines = wrapped.getLines();
 
         Paragraph first = new Paragraph();
         Paragraph tail = new Paragraph();
         
         first.setMaxWidth(this.getMaxWidth());
-        first.setLineSpacing(this.getLineSpacing());
+        first.setLineSpacing(paragraphText.getLineSpacing());
         first.setAlignment(this.getAlignment());
-        first.setApplyLineSpacingToFirstLine(this.isApplyLineSpacingToFirstLine());
+        first.setApplyLineSpacingToFirstLine(paragraphText.isApplyLineSpacingToFirstLine());
         first.setSpaceBefore(this.getSpaceBefore());
         first.setSpaceAfter(0);
         
         tail.setMaxWidth(this.getMaxWidth());
-        tail.setLineSpacing(this.getLineSpacing());
+        tail.setLineSpacing(paragraphText.getLineSpacing());
         tail.setAlignment(this.getAlignment());
-        tail.setApplyLineSpacingToFirstLine(this.isApplyLineSpacingToFirstLine());
+        tail.setApplyLineSpacingToFirstLine(paragraphText.isApplyLineSpacingToFirstLine());
         tail.setSpaceBefore(0);
         tail.setSpaceAfter(this.getSpaceAfter());
 
@@ -174,23 +205,11 @@ public class Paragraph extends TextFlow implements Drawable, Element,
     }
 
     @Override
-    public Paragraph removeLeadingEmptyVerticalSpace() throws Exception {
-        return removeLeadingEmptyLines();
+    public void removeLeadingEmptyVerticalSpace() throws Exception {
+        paragraphText = paragraphText.removeLeadingEmptyLines();
     }
 
-    @Override
-    public Paragraph removeLeadingEmptyLines() throws Exception {
-        Paragraph result = (Paragraph) super.removeLeadingEmptyLines();
-        result.setAbsolutePosition(this.getAbsolutePosition());
-        result.setAlignment(this.getAlignment());
-        return result;
-    }
 
-    @Override
-    protected Paragraph createInstance() {
-        return new Paragraph();
-    }
-    
     
     public Paragraph addTextCarefully(String text, float size, PDType1Font font) throws Exception {
         int start=0;
@@ -199,17 +218,33 @@ public class Paragraph extends TextFlow implements Drawable, Element,
             if (!font.hasGlyph(font.codeToName(codePoint))) {
                 if (start<end) {
                     String unprocessed = text.substring(start, end);
-                    addText(unprocessed, size, font);
+                    paragraphText.addText(unprocessed, size, font);
                 }
-                addText("?", size, font);
+                paragraphText.addText("?", size, font);
                 start = end+1;
             }
         }
         if (start<text.length()) {
             String unprocessed = text.substring(start);
-            addText(unprocessed, size, font);
+            paragraphText.addText(unprocessed, size, font);
         }
         return this;
+    }
+    @Override
+    public float getMaxWidth() {
+        return paragraphText.getMaxWidth();
+    }
+    @Override
+    public void setMaxWidth(float maxWidth) {
+        paragraphText.setMaxWidth(maxWidth);
+        
+    }
+    @Override
+    public float getWidth() throws Exception {
+        return paragraphText.getWidth();
+    }
+    public String toString() {
+        return "Paragraph [text=" + paragraphText + "]";
     }
 
 }

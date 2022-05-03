@@ -387,7 +387,7 @@ public class RenderContext implements DrawContext, DrawListener {
             PageFormat pf = document.getPageFormat();
             Dimension dim = pf.getInteriorDimension();
             contentStream.setStrokingColor(Color.red);
-            contentStream.setLineDashPattern(new float[]{9}, 0);
+            //contentStream.setLineDashPattern(new float[]{9}, 0);
             contentStream.setLineWidth(0.5f);
             contentStream.addRect(pf.getMarginLeft(), pf.getMarginBottom(),
                     dim.getWidth(), dim.getHeight());

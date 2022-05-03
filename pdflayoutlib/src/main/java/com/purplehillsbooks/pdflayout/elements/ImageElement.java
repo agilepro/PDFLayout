@@ -15,8 +15,7 @@ import com.purplehillsbooks.pdflayout.text.Position;
 import com.purplehillsbooks.pdflayout.text.WidthRespecting;
 import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
 
-public class ImageElement implements Element, Drawable, Dividable,
-        WidthRespecting {
+public class ImageElement extends Dividable implements WidthRespecting {
 
     /**
      * Set this to {@link #setWidth(float)} resp. {@link #setHeight(float)}
@@ -136,8 +135,4 @@ public class ImageElement implements Element, Drawable, Dividable,
         }
     }
 
-    @Override
-    public Drawable removeLeadingEmptyVerticalSpace() {
-        return this;
-    }
 }

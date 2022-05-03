@@ -10,7 +10,7 @@ import com.purplehillsbooks.pdflayout.elements.render.VerticalLayout;
  * 
  * All measurements are in points, defined as 72 points/inch, 0.0138 inch, or 0.3527 mm.
  */
-public class PageFormat implements Element {
+public class PageFormat extends Element {
 
     private final float marginLeft;
     private final float marginRight;

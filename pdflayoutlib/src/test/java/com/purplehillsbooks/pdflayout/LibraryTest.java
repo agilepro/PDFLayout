@@ -9,6 +9,8 @@ import org.junit.Test;
 import com.purplehillsbooks.pdflayout.elements.Frame;
 import com.purplehillsbooks.pdflayout.elements.PDFDoc;
 import com.purplehillsbooks.pdflayout.elements.Paragraph;
+import com.purplehillsbooks.pdflayout.elements.Table;
+import com.purplehillsbooks.pdflayout.elements.TableRow;
 
 import java.awt.Color;
 import java.io.File;
@@ -36,6 +38,7 @@ public class LibraryTest {
         
         parseWords();
         
+        createTables();
         createDocumentFramesNeedSpace();
         createLongDocument1();
         createLongDocument2(false);
@@ -46,6 +49,7 @@ public class LibraryTest {
         createDocumentTripleFrames();
         createDocumentSmallFrames();
         createDocumentFramesNewPage();
+
     }
     
     /**
@@ -75,13 +79,13 @@ public class LibraryTest {
         Frame mainFrame = doc.newInteriorFrame();
         
         Paragraph instructions = mainFrame.getNewParagraph();
-        instructions.addText("This document has a lot of largish frames to see if breaking them "
+        instructions.addTextCarefully("This document has a lot of largish frames to see if breaking them "
                 +"across page boundaries is working. ", 12, PDType1Font.COURIER);
         if (keepTogether) {
-            instructions.addText("Frames are NOT allowed to be split, and should be always kept together on a page.", 12, PDType1Font.COURIER);
+            instructions.addTextCarefully("Frames are NOT allowed to be split, and should be always kept together on a page.", 12, PDType1Font.COURIER);
         }
         else {
-            instructions.addText("Frames are allowed to be split. ", 12, PDType1Font.COURIER);
+            instructions.addTextCarefully("Frames are allowed to be split. ", 12, PDType1Font.COURIER);
         }
         
         for (int i=0; i<100; i++) {
@@ -116,7 +120,7 @@ public class LibraryTest {
         Frame mainFrame = doc.newInteriorFrame();
         
         Paragraph instructions = mainFrame.getNewParagraph();
-        instructions.addText("This document has a lot of frames to see if breaking them "
+        instructions.addTextCarefully("This document has a lot of frames to see if breaking them "
                 +"across page boundaries is working. ", 12, PDType1Font.TIMES_BOLD);
         
         
@@ -310,6 +314,77 @@ public class LibraryTest {
         doc.saveToFile(t1file);
         
     }
+    
+    private void createTables() throws Exception {
+        
+        PDFDoc doc = new PDFDoc(50,50,50,50);
+        doc.showMargins = true;
+        Frame mainFrame = doc.newInteriorFrame();
+        
+        for (int totalColumns=1; totalColumns<6; totalColumns++) {
+            
+            for (int totalRows=1; totalRows<15; totalRows=totalRows+3) {
+            
+                Paragraph betweenTables = mainFrame.getNewParagraph();
+                betweenTables.addTextCarefully("Here comes a table with dimensions: ("+totalColumns+","+totalRows+"). ", 9, PDType1Font.HELVETICA);
+                betweenTables.addTextCarefully(generateParagraph(30), 9, PDType1Font.HELVETICA);
+                
+                createRandomTable(mainFrame, totalColumns, totalRows, 0, 5);
+                
+                
+            }
+            
+        }
+        
+        for (int trialMargin=1; trialMargin<4; trialMargin++) {
+            
+            Paragraph betweenTables = mainFrame.getNewParagraph();
+            betweenTables.addTextCarefully("Next table has margin: "+(5*trialMargin)+".  ", 9, PDType1Font.HELVETICA);
+            betweenTables.addTextCarefully(generateParagraph(30), 9, PDType1Font.HELVETICA);
+            
+            createRandomTable(mainFrame, 4, 5, (trialMargin*5), 5);
+            
+        }
+        
+        File t1file = new File(testOutputFolder, "Test10-Tables.pdf");
+        doc.saveToFile(t1file);
+        
+    }
+        
+    
+    static int colorCount = 0;
+    private void createRandomTable(Frame mainFrame, int totalColumns, 
+            int totalRows, float margin, float padding) throws Exception {
+        Table table = mainFrame.getNewTable(totalColumns);
+        for (int i=0; i<totalColumns; i++) {
+            table.setColumnWidth(i, 100);
+        }
+        
+        Color thisColor = Color.blue;
+        if (++colorCount % 2 == 0) {
+            thisColor = Color.green;
+        }
+        
+        for (int row=0; row<totalRows; row++) {
+            TableRow tRow = table.createNewRow();
+            
+            for (int i=0; i<totalColumns; i++) {
+                
+                Frame cell = tRow.getCell(i);
+                cell.setBorderColor(thisColor);
+                cell.setMargin(margin, margin, margin, margin);
+                cell.setPadding(padding, padding, padding, padding);
+                cell.setMaxWidth(100);
+                
+                Paragraph para = cell.getNewParagraph();
+                int x = i+1;
+                int y = row+1;
+                para.addTextCarefully("This cell ("+x+","+y+") of table with "+totalRows+" rows.", 9, PDType1Font.HELVETICA);
+            }
+        }        
+    }
+    
+    
     
     Random r = new Random();
     

@@ -12,7 +12,7 @@ import com.purplehillsbooks.pdflayout.text.Position;
  * A drawable element that occupies some vertical space without any graphical
  * representation.
  */
-public class VerticalSpacer implements Drawable, Element, Dividable {
+public class VerticalSpacer extends Dividable {
 
     private float height;
 
@@ -54,11 +54,6 @@ public class VerticalSpacer implements Drawable, Element, Dividable {
             throws Exception {
         return new Divided(new VerticalSpacer(remainingHeight),
                 new VerticalSpacer(getHeight() - remainingHeight));
-    }
-
-    @Override
-    public Drawable removeLeadingEmptyVerticalSpace() {
-        return this;
     }
 
 }

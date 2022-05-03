@@ -80,9 +80,9 @@ import com.purplehillsbooks.pdflayout.text.WidthRespecting;
  * The border also has its own width and height in between these.
  * 
  */
-public class Frame implements Element, Drawable, WidthRespecting, Dividable {
+public class Frame extends Dividable implements WidthRespecting {
 
-    private List<Drawable> innerList = new CopyOnWriteArrayList<Drawable>();
+    public List<Drawable> innerList = new CopyOnWriteArrayList<Drawable>();
 
     private float paddingLeft;
     private float paddingRight;
@@ -226,13 +226,6 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
      */
     public void setBorderStroke(Stroke borderStroke) {
         this.borderStroke = borderStroke;
-    }
-
-    /**
-     * @return the width of the {@link #getBorderStroke()} or <code>0</code>.
-     */
-    protected float getBorderWidth() {
-        return hasBorder() ? getBorderStroke().getLineWidth() : 0;
     }
 
     /**
@@ -492,14 +485,14 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
      * @return the sum of left/right padding and border width.
      */
     protected float getHorizontalShapeSpacing() {
-        return 2 * getBorderWidth() + getPaddingLeft() + getPaddingRight();
+        return getPaddingLeft() + getPaddingRight();
     }
 
     /**
      * @return the sum of top/bottom padding and border width.
      */
     protected float getVerticalShapeSpacing() {
-        return 2 * getBorderWidth() + getPaddingTop() + getPaddingBottom();
+        return getPaddingTop() + getPaddingBottom();
     }
 
     /**
@@ -578,16 +571,17 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
 
     private static float getHeight(List<Drawable> drawableList) throws Exception {
         float height = 0;
-        if (drawableList != null) {
-            for (Drawable inner : drawableList) {
-                height += inner.getHeight();
-            }
+        if (drawableList == null) {
+            throw new RuntimeException("getHeight of list was called with a null list");
+        }
+        for (Drawable inner : drawableList) {
+            height += inner.getHeight();
         }
         return height;
     }
 
     @Override
-    public Position getAbsolutePosition() throws Exception {
+    public Position getAbsolutePosition() {
         return absolutePosition;
     }
 
@@ -620,6 +614,9 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
         for (Drawable inner : innerList) {
             if (inner instanceof WidthRespecting) {
                 ((WidthRespecting) inner).setMaxWidth(interiorMaxWidth);
+            }
+            else if (inner instanceof Table) {
+                ((Table)inner).propagateMaxWidthToChildren();
             }
         }
     }
@@ -683,9 +680,9 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
      * no absolute position.  Given width will override any maxwidth specified
      * for any other reason.
      */
-    protected void propagateMaxWidthToChildren() throws Exception {
+    public void propagateMaxWidthToChildren() {
         if (getAbsolutePosition() == null && givenWidth>0) {
-            setMaxWidth(givenWidth);
+            setMaxWidth(givenWidth - this.getHorizontalSpacing());
         }
     }
 
@@ -693,20 +690,17 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
             Position upperLeft, DrawListener drawListener) throws Exception {
 
+        if (upperLeft.getY()<0) {
+            throw new Exception("request to draw a Frame at position ("+upperLeft.getX()+","+upperLeft.getY()+")");
+        }
         propagateMaxWidthToChildren();
 
-        float halfBorderWidth = 0;
-        if (getBorderWidth() > 0) {
-            halfBorderWidth = getBorderWidth() / 2f;
-        }
-        upperLeft = upperLeft.add(getMarginLeft() + halfBorderWidth,
-                -getMarginTop() - halfBorderWidth);
+        upperLeft = upperLeft.add(getMarginLeft(),
+                -getMarginTop());
 
         if (getShape() != null) {
-            float shapeWidth = getWidth() - getMarginLeft() - getMarginRight()
-                    - getBorderWidth();
-            float shapeHeight = getHeight() - getMarginTop()
-                    - getMarginBottom() - getBorderWidth();
+            float shapeWidth = getWidth() - getMarginLeft() - getMarginRight();
+            float shapeHeight = getHeight() - getMarginTop() - getMarginBottom();
 
             if (getBackgroundColor() != null) {
                 getShape().fill(pdDocument, contentStream, upperLeft,
@@ -720,8 +714,7 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
             }
         }
 
-        Position innerUpperLeft = upperLeft.add(getPaddingLeft()
-                + halfBorderWidth, -getPaddingTop() - halfBorderWidth);
+        Position innerUpperLeft = upperLeft.add(getPaddingLeft(), -getPaddingTop());
 
         for (Drawable inner : innerList) {
             inner.draw(pdDocument, contentStream, innerUpperLeft, drawListener);
@@ -730,15 +723,17 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
     }
 
     @Override
-    public Drawable removeLeadingEmptyVerticalSpace() throws Exception {
+    public void removeLeadingEmptyVerticalSpace() throws Exception {
+        setMarginTop(0);
         if (innerList.size() > 0) {
-            Drawable drawableWithoutLeadingVerticalSpace = innerList.get(0)
-                    .removeLeadingEmptyVerticalSpace();
-            innerList.set(0, drawableWithoutLeadingVerticalSpace);
+            innerList.get(0).removeLeadingEmptyVerticalSpace();
         }
-        return this;
     }
 
+    public void trimTrailingWhiteSpace() {
+        setMarginBottom(0);
+    }
+    
     @Override
     public Divided divide(float remainingHeight, RenderContext renderContext, boolean topOfPage) throws Exception {
         propagateMaxWidthToChildren();
@@ -778,16 +773,16 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
 
         float spaceLeftForDivided = spaceLeft - getHeight(dividedList.getHead());
         Divided divided = null;
+        
+        Drawable elementToDivide = dividedList.getDrawableToDivide();
 
-        if (dividedList.getDrawableToDivide() != null) {
-            Dividable innerDividable = null;
-            if (dividedList.getDrawableToDivide() instanceof Dividable) {
-                innerDividable = (Dividable) dividedList.getDrawableToDivide();
+        if (elementToDivide != null) {
+            if (elementToDivide.canBeDivided()) {
+                Dividable innerDividable = (Dividable) elementToDivide;
+                divided = innerDividable.divide(spaceLeftForDivided, renderContext, topOfPage);
             } else {
-                innerDividable = new Cutter(dividedList.getDrawableToDivide());
+                divided = new Divided(new VerticalSpacer(spaceLeftForDivided), elementToDivide);
             }
-            // some space left on this page for the inner element
-            divided = innerDividable.divide(spaceLeftForDivided, renderContext, topOfPage);
         }
 
         Float firstHeight = givenHeight<=0 ? 0 : remainingHeight;
@@ -941,5 +936,20 @@ public class Frame implements Element, Drawable, WidthRespecting, Dividable {
         return para;
     }
     
+    public Table getNewTable(int cols) {
+        Table newTable = new Table(cols);
+        this.add(newTable);
+        return newTable;
+    }
+    
+    public String toString() {
+        if (innerList.size()==0) {
+            return "Empty Frame";
+        }
+        Drawable item = innerList.get(0);
+        //if (item instanceof Paragraph) {
+            return item.toString();
+        //}
+    }
 
 }

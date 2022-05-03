@@ -4,7 +4,7 @@ package com.purplehillsbooks.pdflayout.elements;
  * ControlElements do not have a drawable representation, but control page flow,
  * rendering etc.
  */
-public class ControlElement implements Element {
+public class ControlElement extends Element {
 
     /**
      * Triggers a new page in a document.
