@@ -4,6 +4,7 @@ package com.purplehillsbooks.pdflayout.shape;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.text.Position;
 import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
 
@@ -36,10 +37,10 @@ public class RoundRect extends Shape {
     }
 
     @Override
-    public void add(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void add(RenderContext renderContext,
             Position upperLeft, float width, float height) throws Exception {
 
-        addRoundRect(contentStream, upperLeft, width, height, cornerRadiusX, cornerRadiusY);
+        addRoundRect(renderContext.contentStream, upperLeft, width, height, cornerRadiusX, cornerRadiusY);
     }
 
     /**

@@ -46,10 +46,8 @@ public abstract class Drawable extends Element {
     /**
      * Draws the object at the given position.
      *
-     * @param pdDocument
-     *            the underlying pdfbox document.
-     * @param contentStream
-     *            the stream to draw to.
+     * @param renderContext
+     *            the context currently drawing to
      * @param upperLeft
      *            the upper left position to start drawing.
      * @param drawListener

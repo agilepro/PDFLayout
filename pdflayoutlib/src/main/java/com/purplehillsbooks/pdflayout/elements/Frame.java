@@ -716,7 +716,7 @@ public class Frame extends Dividable implements WidthRespecting {
             float shapeHeight = getHeight() - getMarginTop() - getMarginBottom();
 
             if (getBackgroundColor() != null) {
-                getShape().fill(renderContext.pdDocument, renderContext.contentStream, upperLeft,
+                getShape().fill(renderContext, upperLeft,
                         shapeWidth, shapeHeight, getBackgroundColor(),
                         drawListener);
             }

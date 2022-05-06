@@ -4,6 +4,7 @@ package com.purplehillsbooks.pdflayout.shape;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.text.Position;
 
 /**
@@ -12,9 +13,9 @@ import com.purplehillsbooks.pdflayout.text.Position;
 public class Rect extends Shape {
 
     @Override
-    public void add(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void add(RenderContext renderContext,
             Position upperLeft, float width, float height) throws Exception {
-        contentStream.addRect(upperLeft.getX(), upperLeft.getY() - height,
+        renderContext.contentStream.addRect(upperLeft.getX(), upperLeft.getY() - height,
                 width, height);
     }
 

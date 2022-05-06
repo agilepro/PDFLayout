@@ -12,11 +12,11 @@ import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
 
 /**
  * Shapes can be used to either
- * {@link #draw(PDDocument, PDPageContentStream, Position, float, float, Color, Stroke, DrawListener)
+ * {@link #draw(RenderContext, Position, float, float, Color, Stroke, DrawListener)
  * stroke} or
- * {@link #fill(PDDocument, PDPageContentStream, Position, float, float, Color, DrawListener)
+ * {@link #fill(RenderContext, Position, float, float, Color, DrawListener)
  * fill} the path of the shape, or simply
- * {@link #add(PDDocument, PDPageContentStream, Position, float, float) add the
+ * {@link #add(RenderContext, Position, float, float) add the
  * path} of the shape to the drawing context.
  */
 public abstract class Shape {
@@ -24,10 +24,8 @@ public abstract class Shape {
     /**
      * Draws (strokes) the shape.
      *
-     * @param pdDocument
-     *            the underlying pdfbox document.
-     * @param contentStream
-     *            the stream to draw to.
+     * @param renderContext
+     *            the context currently drawing to
      * @param upperLeft
      *            the upper left position to start drawing.
      * @param width
@@ -49,7 +47,7 @@ public abstract class Shape {
             Position upperLeft, float width, float height, Color color,
             Stroke stroke, DrawListener drawListener) throws Exception {
 
-        add(renderContext.pdDocument, renderContext.contentStream, upperLeft, width, height);
+        add(renderContext, upperLeft, width, height);
 
         if (stroke != null) {
             stroke.applyTo(renderContext.contentStream);
@@ -68,10 +66,8 @@ public abstract class Shape {
     /**
      * Fills the shape.
      *
-     * @param pdDocument
-     *            the underlying pdfbox document.
-     * @param contentStream
-     *            the stream to draw to.
+     * @param renderContext
+     *            the context currently drawing to
      * @param upperLeft
      *            the upper left position to start drawing.
      * @param width
@@ -87,16 +83,16 @@ public abstract class Shape {
      * @throws Exception
      *             by pdfbox
      */
-    public void fill(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void fill(RenderContext renderContext,
             Position upperLeft, float width, float height, Color color,
             DrawListener drawListener) throws Exception {
 
-        add(pdDocument, contentStream, upperLeft, width, height);
+        add(renderContext, upperLeft, width, height);
 
         if (color != null) {
-            contentStream.setNonStrokingColor(color);
+            renderContext.contentStream.setNonStrokingColor(color);
         }
-        CompatibilityHelper.fillNonZero(contentStream);
+        CompatibilityHelper.fillNonZero(renderContext.contentStream);
 
         if (drawListener != null) {
             drawListener.drawn(this, upperLeft, width, height);
@@ -107,10 +103,8 @@ public abstract class Shape {
     /**
      * Adds (the path of) the shape without drawing anything.
      *
-     * @param pdDocument
-     *            the underlying pdfbox document.
-     * @param contentStream
-     *            the stream to draw to.
+     * @param renderContext
+     *            the context currently drawing to
      * @param upperLeft
      *            the upper left position to start drawing.
      * @param width
@@ -120,7 +114,7 @@ public abstract class Shape {
      * @throws Exception
      *             by pdfbox
      */
-    public abstract void add(PDDocument pdDocument, PDPageContentStream contentStream,
+    public abstract void add(RenderContext renderContext,
             Position upperLeft, float width, float height) throws Exception;
 
 }
