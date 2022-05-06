@@ -107,6 +107,19 @@ public class Frame extends Dividable implements WidthRespecting {
     private boolean keepTogether = false;
     private float needSpace = 0;
     
+    
+    /**
+     * Header and footer settings: if set to a non nulll value
+     * they will change the header one the page that it is printed
+     * on.  The LAST frame on the page takes precedence.
+     */
+    public String headerLeft;
+    public String headerCenter;
+    public String headerRight;
+    
+    public String footerLeft;
+    public String footerCenter;
+    public String footerRight;
 
     private Position absolutePosition;
 
@@ -687,7 +700,7 @@ public class Frame extends Dividable implements WidthRespecting {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(RenderContext renderContext,
             Position upperLeft, DrawListener drawListener) throws Exception {
 
         if (upperLeft.getY()<0) {
@@ -703,21 +716,41 @@ public class Frame extends Dividable implements WidthRespecting {
             float shapeHeight = getHeight() - getMarginTop() - getMarginBottom();
 
             if (getBackgroundColor() != null) {
-                getShape().fill(pdDocument, contentStream, upperLeft,
+                getShape().fill(renderContext.pdDocument, renderContext.contentStream, upperLeft,
                         shapeWidth, shapeHeight, getBackgroundColor(),
                         drawListener);
             }
             if (hasBorder()) {
-                getShape().draw(pdDocument, contentStream, upperLeft,
+                getShape().draw(renderContext, upperLeft,
                         shapeWidth, shapeHeight, getBorderColor(),
                         getBorderStroke(), drawListener);
             }
         }
+        
+        if (headerLeft!=null) {
+            renderContext.headerLeft = headerLeft;
+        }
+        if (headerCenter!=null) {
+            renderContext.headerCenter = headerCenter;
+        }
+        if (headerRight!=null) {
+            renderContext.headerRight = headerRight;
+        }
+        if (footerLeft!=null) {
+            renderContext.footerLeft = footerLeft;
+        }
+        if (footerCenter!=null) {
+            renderContext.footerCenter = footerCenter;
+        }
+        if (footerRight!=null) {
+            renderContext.footerRight = footerRight;
+        }
+
 
         Position innerUpperLeft = upperLeft.add(getPaddingLeft(), -getPaddingTop());
 
         for (Drawable inner : innerList) {
-            inner.draw(pdDocument, contentStream, innerUpperLeft, drawListener);
+            inner.draw(renderContext, innerUpperLeft, drawListener);
             innerUpperLeft = innerUpperLeft.add(0, -inner.getHeight());
         }
     }
@@ -952,6 +985,10 @@ public class Frame extends Dividable implements WidthRespecting {
         //if (item instanceof Paragraph) {
             return item.toString();
         //}
+    }
+    
+    public void SetHeaderLeft(String value) {
+        headerLeft = value;
     }
 
 }

@@ -51,10 +51,10 @@ public class Cutter extends Dividable {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(RenderContext renderContext,
             Position upperLeft, DrawListener drawListener) throws Exception {
         Position viewPortOrigin = upperLeft.add(0, -viewPortY);
-        undividable.draw(pdDocument, contentStream, viewPortOrigin, drawListener);
+        undividable.draw(renderContext, viewPortOrigin, drawListener);
     }
 
     @Override

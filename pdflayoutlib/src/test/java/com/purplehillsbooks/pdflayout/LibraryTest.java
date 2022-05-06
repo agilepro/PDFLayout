@@ -150,6 +150,12 @@ public class LibraryTest {
         
         for (int i=0; i<100; i++) {
             Frame innerFrame = mainFrame.newInteriorFrame();
+            innerFrame.headerLeft = "FrameLeft "+i;
+            innerFrame.headerCenter = "FrameCenter "+i;
+            innerFrame.headerRight = "FrameRight "+i;
+            innerFrame.footerLeft = "long long FrameLeft "+i;
+            innerFrame.footerCenter = "long long long long long long FrameCenter "+i;
+            innerFrame.footerRight = "long long FrameRight "+i;
             Color thisColor = Color.blue;
             if (i % 2 == 0) {
                 thisColor = Color.green;
@@ -174,6 +180,12 @@ public class LibraryTest {
         
         for (int i=0; i<200; i++) {
             Frame innerFrame = mainFrame.newInteriorFrame();
+            innerFrame.headerLeft = "FrameLeft "+i;
+            innerFrame.headerCenter = "FrameCenter "+i;
+            innerFrame.headerRight = "FrameRight "+i;
+            innerFrame.footerLeft = "iiiiiiiiiiiiiiiiiiii FrameLeft "+i;
+            innerFrame.footerCenter = "long long long long long long FrameCenter "+i;
+            innerFrame.footerRight = "MMMMMMMMMMMMMMMMMMMM Right "+i;
             Color thisColor = Color.blue;
             if (i % 2 == 0) {
                 thisColor = Color.green;
@@ -201,6 +213,12 @@ public class LibraryTest {
         
         for (int i=0; i<200; i++) {
             Frame innerFrame = mainFrame.newInteriorFrame();
+            innerFrame.headerLeft = "FrameLeft "+i;
+            innerFrame.headerCenter = "FrameCenter "+i;
+            innerFrame.headerRight = "FrameRight "+i;
+            innerFrame.footerLeft = "FrameLeft "+i;
+            innerFrame.footerCenter = "FrameCenter "+i;
+            innerFrame.footerRight = "FrameRight "+i;
             Color thisColor = Color.blue;
             if (i % 2 == 0) {
                 thisColor = Color.green;
@@ -232,6 +250,12 @@ public class LibraryTest {
         
         for (int i=0; i<200; i++) {
             Frame innerFrame = mainFrame.newInteriorFrame();
+            innerFrame.headerLeft = "FrameLeft "+i;
+            innerFrame.headerCenter = "FrameCenter "+i;
+            innerFrame.headerRight = "FrameRight "+i;
+            innerFrame.footerLeft = "FrameLeft "+i;
+            innerFrame.footerCenter = "FrameCenter "+i;
+            innerFrame.footerRight = "FrameRight "+i;
             Color thisColor = Color.blue;
             if (i % 2 == 0) {
                 thisColor = Color.green;
@@ -242,7 +266,7 @@ public class LibraryTest {
             Paragraph para = innerFrame.getNewParagraph();
             para.setSpaceAfter(0);
             para.setSpaceBefore(0);
-            para.addTextCarefully("Just one line of text", 12, PDType1Font.HELVETICA);
+            para.addTextCarefully("Just one line of text "+i, 12, PDType1Font.HELVETICA);
         }
         
         File t1file = new File(testOutputFolder, "Test7-SmallFrames.pdf");
@@ -257,6 +281,12 @@ public class LibraryTest {
         
         for (int i=0; i<200; i++) {
             Frame innerFrame = mainFrame.newInteriorFrame();
+            innerFrame.headerLeft = "FrameLeft "+i;
+            innerFrame.headerCenter = "FrameCenter "+i;
+            innerFrame.headerRight = "FrameRight "+i;
+            innerFrame.footerLeft = "FrameLeft "+i;
+            innerFrame.footerCenter = "FrameCenter "+i;
+            innerFrame.footerRight = "FrameRight "+i;
             Color thisColor = Color.blue;
             if (i % 2 == 0) {
                 thisColor = Color.green;
@@ -270,10 +300,10 @@ public class LibraryTest {
             if (r.nextInt(6)==0) {
                 innerFrame.setStartNewPage(true);
                 innerFrame.setBackgroundColor(Color.yellow);
-                para.addTextCarefully("This frame should always be at top of new page", 12, PDType1Font.HELVETICA);
+                para.addTextCarefully("This frame should always be at top of new page "+i, 12, PDType1Font.HELVETICA);
             }
             else {
-                para.addTextCarefully("Just one line of text, usually not at top of page", 12, PDType1Font.HELVETICA);
+                para.addTextCarefully("Just one line of text, usually not at top of page "+i, 12, PDType1Font.HELVETICA);
             }
         }
         

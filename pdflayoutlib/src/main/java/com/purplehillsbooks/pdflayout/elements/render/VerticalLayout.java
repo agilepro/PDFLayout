@@ -98,8 +98,7 @@ public class VerticalLayout extends Layout {
     protected void renderAbsolute(final RenderContext renderContext,
             Drawable drawable,
             final Position position) throws Exception {
-        drawable.draw(renderContext.getPdDocument(),
-                renderContext.getContentStream(), position, renderContext);
+        drawable.draw(renderContext, position, renderContext);
     }
 
     /**
@@ -289,7 +288,7 @@ public class VerticalLayout extends Layout {
                 renderContext.getHeight());
         CompatibilityHelper.clip(contentStream);
 
-        drawable.draw(renderContext.getPdDocument(), contentStream,
+        drawable.draw(renderContext,
                 renderContext.getCurrentPosition().add(offsetX, 0),renderContext);
 
         contentStream.restoreGraphicsState();

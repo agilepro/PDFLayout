@@ -140,7 +140,7 @@ public class Paragraph extends Dividable implements WidthRespecting  {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(RenderContext renderContext,
             Position upperLeft, DrawListener drawListener) throws Exception {
         if (paragraphText.isEmpty()) {
             //if the paragraph has absolutely no text in it, then ignore it
@@ -149,7 +149,7 @@ public class Paragraph extends Dividable implements WidthRespecting  {
         }
         //we need to move the paragraph down by the amount of spaceBefore
         Position spacedPosition = upperLeft.add(0, -spaceBefore);
-        paragraphText.drawText(contentStream, spacedPosition, getAlignment(), drawListener );
+        paragraphText.drawText(renderContext.contentStream, spacedPosition, getAlignment(), drawListener );
         
         //for debug make a rectangle
         /*

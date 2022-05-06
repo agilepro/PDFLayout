@@ -3,11 +3,8 @@ package com.purplehillsbooks.pdflayout.text;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
@@ -18,35 +15,20 @@ import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
  */
 public class TextLine extends TextSequence {
 
-    /**
-     * The font ascent.
-     */
-    private static final String ASCENT = "ascent";
-    /**
-     * The font height.
-     */
-    private static final String HEIGHT = "height";
-    /**
-     * The text width.
-     */
-    private static final String WIDTH = "width";
 
     private final List<StyledText> styledTextList = new ArrayList<StyledText>();
     private NewLine newLine;
-    private Map<String, Object> cache = new HashMap<String, Object>();
+    
+    float ascent = 0;
+    float height = 0;
+    float width = 0;
 
     private void clearCache() {
-        cache.clear();
+        ascent = 0;
+        height = 0;
+        width = 0;
     }
 
-    private void setCachedValue(final String key, Object value) {
-        cache.put(key, value);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T getCachedValue(final String key, Class<T> type) {
-        return (T) cache.get(key);
-    }
 
     /**
      * Adds a styled text.
@@ -111,26 +93,20 @@ public class TextLine extends TextSequence {
 
     @Override
     public float getWidth() throws Exception {
-        Float width = getCachedValue(WIDTH, Float.class);
-        if (width == null) {
-            width = 0f;
+        if (width == 0) {
             for (TextFragment fragment : this) {
                 width += fragment.getWidth();
             }
-            setCachedValue(WIDTH, width);
         }
         return width;
     }
 
     @Override
     public float getHeight() throws Exception {
-        Float height = getCachedValue(HEIGHT, Float.class);
-        if (height == null) {
-            height = 0f;
+        if (height == 0) {
             for (TextFragment fragment : this) {
                 height = Math.max(height, fragment.getHeight());
             }
-            setCachedValue(HEIGHT, height);
         }
         return height;
     }
@@ -141,16 +117,13 @@ public class TextLine extends TextSequence {
      *             by pdfbox.
      */
     protected float getAscent() throws Exception {
-        Float ascent = getCachedValue(ASCENT, Float.class);
-        if (ascent == null) {
-            ascent = 0f;
+        if (ascent == 0) {
             for (TextFragment fragment : this) {
                 float currentAscent = fragment.getFontDescriptor().getSize()
                         * fragment.getFontDescriptor().getFont()
                                 .getFontDescriptor().getAscent() / 1000;
                 ascent = Math.max(ascent, currentAscent);
             }
-            setCachedValue(ASCENT, ascent);
         }
         return ascent;
     }

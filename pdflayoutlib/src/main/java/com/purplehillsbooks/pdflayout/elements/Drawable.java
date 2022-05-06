@@ -5,6 +5,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
 import com.purplehillsbooks.pdflayout.elements.render.Layout;
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
 
@@ -57,7 +58,7 @@ public abstract class Drawable extends Element {
      *            drawn objects.
      * @throws Exception (forced javadoc nonsense)
      */
-    public abstract void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public abstract void draw(RenderContext renderContext,
             Position upperLeft, DrawListener drawListener) throws Exception;
 
     /**

@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
 import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
@@ -44,19 +45,19 @@ public abstract class Shape {
      * @throws Exception
      *             by pdfbox
      */
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(RenderContext renderContext,
             Position upperLeft, float width, float height, Color color,
             Stroke stroke, DrawListener drawListener) throws Exception {
 
-        add(pdDocument, contentStream, upperLeft, width, height);
+        add(renderContext.pdDocument, renderContext.contentStream, upperLeft, width, height);
 
         if (stroke != null) {
-            stroke.applyTo(contentStream);
+            stroke.applyTo(renderContext.contentStream);
         }
         if (color != null) {
-            contentStream.setStrokingColor(color);
+            renderContext.contentStream.setStrokingColor(color);
         }
-        contentStream.stroke();
+        renderContext.contentStream.stroke();
 
         if (drawListener != null) {
             drawListener.drawn(this, upperLeft, width, height);

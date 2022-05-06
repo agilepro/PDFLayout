@@ -61,17 +61,17 @@ public class TableRow extends Drawable {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream, Position upperLeft,
+    public void draw(RenderContext renderContext, Position upperLeft,
             DrawListener drawListener) throws Exception {
         Position cellStart = new Position(upperLeft.getX(), upperLeft.getY());
         for (int i=0; i<cells.size(); i++) {
             Frame cell = cells.get(i);
-            cell.draw(pdDocument, contentStream, cellStart, drawListener);
+            cell.draw(renderContext, cellStart, drawListener);
             cellStart = cellStart.add(table.getColumnWidth(i), 0);
-            contentStream.moveTo(cellStart.getX(), cellStart.getY());
+            renderContext.contentStream.moveTo(cellStart.getX(), cellStart.getY());
         }
 
-        contentStream.moveTo(upperLeft.getX(), upperLeft.getY()-getHeight());
+        renderContext.contentStream.moveTo(upperLeft.getX(), upperLeft.getY()-getHeight());
     }
 
     @Override

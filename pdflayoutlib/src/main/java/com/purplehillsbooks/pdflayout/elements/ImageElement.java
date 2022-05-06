@@ -126,9 +126,9 @@ public class ImageElement extends Dividable implements WidthRespecting {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(RenderContext renderContext,
             Position upperLeft, DrawListener drawListener) throws Exception {
-        CompatibilityHelper.drawImage(image, pdDocument, contentStream,
+        CompatibilityHelper.drawImage(image, renderContext.pdDocument, renderContext.contentStream,
                 upperLeft, getWidth(), getHeight());
         if (drawListener != null) {
             drawListener.drawn(this, upperLeft, getWidth(), getHeight());

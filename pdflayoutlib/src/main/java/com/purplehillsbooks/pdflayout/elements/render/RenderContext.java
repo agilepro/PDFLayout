@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import com.purplehillsbooks.pdflayout.elements.ControlElement;
 import com.purplehillsbooks.pdflayout.elements.Dimension;
@@ -20,6 +22,7 @@ import com.purplehillsbooks.pdflayout.elements.PositionControl.SetPosition;
 import com.purplehillsbooks.pdflayout.text.DrawContext;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
+import com.purplehillsbooks.pdflayout.text.StyledText;
 import com.purplehillsbooks.pdflayout.text.annotations.AnnotationDrawListener;
 import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
 
@@ -28,12 +31,17 @@ import com.purplehillsbooks.pdflayout.util.CompatibilityHelper;
  * rendering process.
  */
 public class RenderContext implements DrawContext, DrawListener {
+    
+    static public float HEADER_SIZE = 8;
+    //static public PDType1Font HEADER_FONT = PDType1Font.TIMES_ROMAN;
+    static public PDType1Font HEADER_FONT = PDType1Font.HELVETICA;
+    //static public PDType1Font HEADER_FONT = PDType1Font.COURIER;
 
     private final PDFDoc document;
-    private final PDDocument pdDocument;
+    public final PDDocument pdDocument;
     private PDPage currentPage;
     private int pageIndex = 0;
-    private PDPageContentStream contentStream;
+    public PDPageContentStream contentStream;
     private Position currentPosition;
     private Position markedPosition;
     private Position maxPositionOnPage;
@@ -43,6 +51,14 @@ public class RenderContext implements DrawContext, DrawListener {
     private PageFormat pageFormat;
 
     private AnnotationDrawListener annotationDrawListener;
+    
+    public String headerLeft;
+    public String headerCenter;
+    public String headerRight;
+    
+    public String footerLeft;
+    public String footerCenter;
+    public String footerRight;
 
     /**
      * Creates a render context.
@@ -394,6 +410,74 @@ public class RenderContext implements DrawContext, DrawListener {
             contentStream.stroke();
         }
     }
+    
+    private void writeTextAtPosition(String txt, float x, float y, float width) throws Exception {
+        contentStream.beginText();
+        CompatibilityHelper.setTextTranslation(contentStream, x, y);
+        contentStream.showText(txt);
+        contentStream.endText();
+    }
+    
+    private void drawHeaders() throws Exception {
+        PageFormat pf = document.getPageFormat();
+        PDRectangle mediaBox = pf.getMediaBox();
+        
+
+        float headerLine = mediaBox.getUpperRightY()-(pf.getMarginTop()/2)-HEADER_SIZE;
+        float footerLine = mediaBox.getLowerLeftY()+(pf.getMarginBottom()/2);
+        
+        float leftSide = mediaBox.getLowerLeftX()+pf.getMarginLeft();
+        float rightSide = mediaBox.getUpperRightX()-pf.getMarginRight();
+        float center = (leftSide+rightSide)/2;
+        
+        if (document.showMargins) {
+            contentStream.setStrokingColor(Color.red);
+            contentStream.setLineWidth(0.5f);
+            contentStream.addRect(leftSide, headerLine,
+                    rightSide-leftSide, HEADER_SIZE);
+            contentStream.addRect(leftSide, footerLine,
+                    rightSide-leftSide, HEADER_SIZE);
+            contentStream.stroke();
+        }
+        
+        
+        
+
+        
+        contentStream.setFont(HEADER_FONT, HEADER_SIZE);
+        
+        if (headerLeft!=null) {
+            StyledText t = new StyledText(headerLeft, HEADER_SIZE, HEADER_FONT);
+            float width = t.getWidth();
+            writeTextAtPosition(headerLeft, leftSide, headerLine, width);
+        }
+        if (headerCenter!=null) {
+            StyledText t = new StyledText(headerCenter, HEADER_SIZE, HEADER_FONT);
+            float width = t.getWidth();
+            writeTextAtPosition(headerCenter,center-(width/2), headerLine, width);
+        }
+        if (headerRight!=null) {
+            StyledText t = new StyledText(headerRight, HEADER_SIZE, HEADER_FONT);
+            float width = t.getWidth();
+            writeTextAtPosition(headerRight, rightSide-width, headerLine, width);
+        }
+        if (footerLeft!=null) {
+            StyledText t = new StyledText(footerLeft, HEADER_SIZE, HEADER_FONT);
+            float width = t.getWidth();
+            writeTextAtPosition(footerLeft, leftSide, footerLine, width);
+        }
+        if (footerCenter!=null) {
+            StyledText t = new StyledText(footerCenter, HEADER_SIZE, HEADER_FONT);
+            float width = t.getWidth();
+            writeTextAtPosition(footerCenter, center-(width/2), footerLine, width);
+        }
+        if (footerRight!=null) {
+            StyledText t = new StyledText(footerRight, HEADER_SIZE, HEADER_FONT);
+            float width = t.getWidth();
+            writeTextAtPosition(footerRight, rightSide-width, footerLine, width);
+        }
+        
+    }
 
     /**
      * Closes the current page.
@@ -404,7 +488,9 @@ public class RenderContext implements DrawContext, DrawListener {
      */
     public boolean closePage() throws Exception {
         if (contentStream != null) {
-
+            
+            drawHeaders();
+            
             annotationDrawListener.afterPage(this);
             document.afterPage(this);
 

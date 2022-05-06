@@ -42,7 +42,7 @@ public class VerticalSpacer extends Dividable {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(RenderContext renderContext,
             Position upperLeft, DrawListener drawListener) throws Exception {
         if (drawListener != null) {
             drawListener.drawn(this, upperLeft, getWidth(), getHeight());

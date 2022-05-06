@@ -111,14 +111,14 @@ public class Table extends Dividable {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream, Position upperLeft,
+    public void draw(RenderContext renderContext, Position upperLeft,
             DrawListener drawListener) throws Exception {
         Position position = upperLeft;
         for (TableRow tr : rows) {
-            contentStream.moveTo(position.getX(), position.getY());
-            tr.draw(pdDocument, contentStream, position, drawListener);
+            renderContext.contentStream.moveTo(position.getX(), position.getY());
+            tr.draw(renderContext, position, drawListener);
             position = position.add(0, -tr.getHeight());
-            contentStream.moveTo(position.getX(), position.getY());
+            renderContext.contentStream.moveTo(position.getX(), position.getY());
         }
         
     }

@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 
+import com.purplehillsbooks.pdflayout.elements.render.RenderContext;
 import com.purplehillsbooks.pdflayout.shape.Stroke;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
@@ -64,18 +65,18 @@ public class HorizontalRuler extends Drawable implements WidthRespecting {
     }
 
     @Override
-    public void draw(PDDocument pdDocument, PDPageContentStream contentStream,
+    public void draw(RenderContext renderContext,
             Position upperLeft, DrawListener drawListener) throws Exception {
         if (getColor() != null) {
-            contentStream.setStrokingColor(getColor());
+            renderContext.contentStream.setStrokingColor(getColor());
         }
         if (getStroke() != null) {
-            getStroke().applyTo(contentStream);
+            getStroke().applyTo(renderContext.contentStream);
             float x = upperLeft.getX();
             float y = upperLeft.getY() - getStroke().getLineWidth() / 2;
-            contentStream.moveTo(x, y);
-            contentStream.lineTo(x + getWidth(), y);
-            contentStream.stroke();
+            renderContext.contentStream.moveTo(x, y);
+            renderContext.contentStream.lineTo(x + getWidth(), y);
+            renderContext.contentStream.stroke();
         }
         if (drawListener != null) {
             drawListener.drawn(this, upperLeft, getWidth(), getHeight());
