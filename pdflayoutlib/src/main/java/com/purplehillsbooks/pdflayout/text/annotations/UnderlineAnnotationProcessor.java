@@ -59,7 +59,7 @@ public class UnderlineAnnotationProcessor implements AnnotationProcessor {
     @Override
     public void afterPage(DrawContext drawContext) throws Exception {
         for (Line line : linesOnPage) {
-            line.draw(drawContext.getCurrentPageContentStream());
+            line.draw(drawContext.getContentStream());
         }
         linesOnPage.clear();
     }

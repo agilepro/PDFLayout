@@ -65,7 +65,6 @@ public class PDFDoc implements RenderListener {
     public final static PageFormat DEFAULT_PAGE_FORMAT = new PageFormat();
 
     private final List<Entry<Element, LayoutHint>> elements = new ArrayList<>();
-    //private final List<Renderer> customRenderer = new CopyOnWriteArrayList<Renderer>();
     private final List<RenderListener> renderListener = new CopyOnWriteArrayList<RenderListener>();
 
     private PDDocument pdDocument;
@@ -180,35 +179,6 @@ public class PDFDoc implements RenderListener {
         this.pdDocument = null;
     }
 
-    /**
-     * Adds a (custom) {@link Renderer} that may handle the rendering of an
-     * element. All renderers will be asked to render the current element in the
-     * order they have been added. If no renderer is capable, the default
-     * renderer will be asked.
-     *
-     * @param renderer
-     *            the renderer to add.
-     */
-    /* comment out until we have a test for this
-    public void addRenderer(final Renderer renderer) {
-        if (renderer != null) {
-            customRenderer.add(renderer);
-        }
-    }
-    */
-
-    /**
-     * Removes a {@link Renderer} .
-     *
-     * @param renderer
-     *            the renderer to remove.
-     */
-
-    /* comment out until we have a test for this
-    public void removeRenderer(final Renderer renderer) {
-        customRenderer.remove(renderer);
-    }
-    */
 
     /**
      * Renders all elements and returns the resulting {@link PDDocument}.
@@ -225,16 +195,6 @@ public class PDFDoc implements RenderListener {
             LayoutHint layoutHint = entry.getValue();
             boolean success = false;
 
-            // first ask custom renderer to render the element
-            
-
-            /* comment out until we have a test for this
-            Iterator<Renderer> customRendererIterator = customRenderer.iterator();
-            while (!success && customRendererIterator.hasNext()) {
-                success = customRendererIterator.next().render(renderContext,
-                        element, layoutHint);
-            }
-            */
 
             // if none of them felt responsible, let the default renderer do the job.
             if (!success) {

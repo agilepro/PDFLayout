@@ -15,10 +15,6 @@ import com.purplehillsbooks.pdflayout.elements.PDFDoc;
 import com.purplehillsbooks.pdflayout.elements.Element;
 import com.purplehillsbooks.pdflayout.elements.Orientation;
 import com.purplehillsbooks.pdflayout.elements.PageFormat;
-import com.purplehillsbooks.pdflayout.elements.PositionControl;
-import com.purplehillsbooks.pdflayout.elements.PositionControl.MarkPosition;
-import com.purplehillsbooks.pdflayout.elements.PositionControl.MovePosition;
-import com.purplehillsbooks.pdflayout.elements.PositionControl.SetPosition;
 import com.purplehillsbooks.pdflayout.text.DrawContext;
 import com.purplehillsbooks.pdflayout.text.DrawListener;
 import com.purplehillsbooks.pdflayout.text.Position;
@@ -283,11 +279,6 @@ public class RenderContext implements DrawContext, DrawListener {
         return currentPage;
     }
 
-    @Override
-    public PDPageContentStream getCurrentPageContentStream() {
-        return getContentStream();
-    }
-
     /**
      * @return the current PDPageContentStream.
      */
@@ -314,9 +305,6 @@ public class RenderContext implements DrawContext, DrawListener {
             newPage();
             return true;
         }
-        if (element instanceof PositionControl) {
-            return render((PositionControl) element);
-        }
         if (element instanceof PageFormat) {
             nextPageFormat = (PageFormat) element;
             return true;
@@ -328,38 +316,7 @@ public class RenderContext implements DrawContext, DrawListener {
         return false;
     }
 
-    protected boolean render(final PositionControl positionControl) {
-        if (positionControl instanceof MarkPosition) {
-            setMarkedPosition(getCurrentPosition());
-            return true;
-        }
-        if (positionControl instanceof SetPosition) {
-            SetPosition setPosition = (SetPosition) positionControl;
-            Float x = setPosition.getX();
-            if (x == PositionControl.MARKED_POSITION) {
-                x = getMarkedPosition().getX();
-            }
-            if (x == null) {
-                x = getCurrentPosition().getX();
-            }
-            Float y = setPosition.getY();
-            if (y == PositionControl.MARKED_POSITION) {
-                y = getMarkedPosition().getY();
-            }
-            if (y == null) {
-                y = getCurrentPosition().getY();
-            }
-            Position newPosition = new Position(x, y);
-            currentPosition = newPosition;
-            return true;
-        }
-        if (positionControl instanceof MovePosition) {
-            MovePosition movePosition = (MovePosition) positionControl;
-            movePositionBy(movePosition.getX(), movePosition.getY());
-            return true;
-        }
-        return false;
-    }
+
 
     /**
      * Triggers a new page.
@@ -411,11 +368,22 @@ public class RenderContext implements DrawContext, DrawListener {
         }
     }
     
-    private void writeTextAtPosition(String txt, float x, float y, float width) throws Exception {
+    private void writeStyledTextAtPosition(StyledText txt, float x, float y, float width) throws Exception {
         contentStream.beginText();
         CompatibilityHelper.setTextTranslation(contentStream, x, y);
-        contentStream.showText(txt);
+        contentStream.showText(txt.getText());
         contentStream.endText();
+    }
+    
+    
+    private String doPageNumbers(String source) {
+        int tokenPos = source.indexOf("{#}");
+        if (tokenPos<0) {
+            return source;
+        }
+        String before = source.substring(0,tokenPos);
+        String after = source.substring(tokenPos+3);
+        return before + Integer.toString(pageIndex+1) + after;
     }
     
     private void drawHeaders() throws Exception {
@@ -446,35 +414,35 @@ public class RenderContext implements DrawContext, DrawListener {
         
         contentStream.setFont(HEADER_FONT, HEADER_SIZE);
         
-        if (headerLeft!=null) {
-            StyledText t = new StyledText(headerLeft, HEADER_SIZE, HEADER_FONT);
+        if (headerLeft!=null && headerLeft.length()>0) {
+            StyledText t = new StyledText(doPageNumbers(headerLeft), HEADER_SIZE, HEADER_FONT);
             float width = t.getWidth();
-            writeTextAtPosition(headerLeft, leftSide, headerLine, width);
+            writeStyledTextAtPosition(t, leftSide, headerLine, width);
         }
-        if (headerCenter!=null) {
-            StyledText t = new StyledText(headerCenter, HEADER_SIZE, HEADER_FONT);
+        if (headerCenter!=null && headerCenter.length()>0) {
+            StyledText t = new StyledText(doPageNumbers(headerCenter), HEADER_SIZE, HEADER_FONT);
             float width = t.getWidth();
-            writeTextAtPosition(headerCenter,center-(width/2), headerLine, width);
+            writeStyledTextAtPosition(t,center-(width/2), headerLine, width);
         }
-        if (headerRight!=null) {
-            StyledText t = new StyledText(headerRight, HEADER_SIZE, HEADER_FONT);
+        if (headerRight!=null && headerRight.length()>0) {
+            StyledText t = new StyledText(doPageNumbers(headerRight), HEADER_SIZE, HEADER_FONT);
             float width = t.getWidth();
-            writeTextAtPosition(headerRight, rightSide-width, headerLine, width);
+            writeStyledTextAtPosition(t, rightSide-width, headerLine, width);
         }
-        if (footerLeft!=null) {
-            StyledText t = new StyledText(footerLeft, HEADER_SIZE, HEADER_FONT);
+        if (footerLeft!=null && footerLeft.length()>0) {
+            StyledText t = new StyledText(doPageNumbers(footerLeft), HEADER_SIZE, HEADER_FONT);
             float width = t.getWidth();
-            writeTextAtPosition(footerLeft, leftSide, footerLine, width);
+            writeStyledTextAtPosition(t, leftSide, footerLine, width);
         }
-        if (footerCenter!=null) {
-            StyledText t = new StyledText(footerCenter, HEADER_SIZE, HEADER_FONT);
+        if (footerCenter!=null && footerCenter.length()>0) {
+            StyledText t = new StyledText(doPageNumbers(footerCenter), HEADER_SIZE, HEADER_FONT);
             float width = t.getWidth();
-            writeTextAtPosition(footerCenter, center-(width/2), footerLine, width);
+            writeStyledTextAtPosition(t, center-(width/2), footerLine, width);
         }
-        if (footerRight!=null) {
-            StyledText t = new StyledText(footerRight, HEADER_SIZE, HEADER_FONT);
+        if (footerRight!=null && footerRight.length()>0) {
+            StyledText t = new StyledText(doPageNumbers(footerRight), HEADER_SIZE, HEADER_FONT);
             float width = t.getWidth();
-            writeTextAtPosition(footerRight, rightSide-width, footerLine, width);
+            writeStyledTextAtPosition(t, rightSide-width, footerLine, width);
         }
         
     }
@@ -486,7 +454,7 @@ public class RenderContext implements DrawContext, DrawListener {
      * @throws Exception
      *             by pdfbox
      */
-    public boolean closePage() throws Exception {
+    private boolean closePage() throws Exception {
         if (contentStream != null) {
             
             drawHeaders();
@@ -514,11 +482,8 @@ public class RenderContext implements DrawContext, DrawListener {
             closePage();
             annotationDrawListener.afterRender();
         }
-        catch (IOException ioe) {
-            throw ioe;
-        }
         catch (Exception e) {
-            throw new IOException(e);
+            throw new IOException("Unable to close the current page.", e);
         }
     }
 

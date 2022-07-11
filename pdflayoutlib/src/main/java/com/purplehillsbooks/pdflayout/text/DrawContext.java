@@ -22,5 +22,5 @@ public interface DrawContext {
     /**
      * @return the current page content stream.
      */
-    public PDPageContentStream getCurrentPageContentStream();
+    public PDPageContentStream getContentStream();
 }
