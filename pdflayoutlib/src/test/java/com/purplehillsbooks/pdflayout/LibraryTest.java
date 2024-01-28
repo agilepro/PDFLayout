@@ -4,7 +4,7 @@
 package com.purplehillsbooks.pdflayout;
 
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.purplehillsbooks.pdflayout.elements.Frame;
 import com.purplehillsbooks.pdflayout.elements.PDFDoc;
@@ -478,105 +478,38 @@ public class LibraryTest {
         w.close();    
     }
     
-    String sampleWords = " Immanuel Kant was born April 22, 1724 in Konigsberg, near the southeastern shore of the "
-            + "Baltic Sea. today Konigsberg has been renamed Kaliningrad and is part of Russia. but during Kant's "
-            + "lifetime Konigsberg was the capital of East Prussia, and its dominant language was German. "
-            + "though geographically remote from the rest of Prussia and other German cities, Konigsberg was "
-            + "then a major commercial center, an important military port, and a relatively cosmopolitan university town.\n" + 
+    String sampleWords = " Kant(a) (22 April 1724 â€“ 12 February 1804) was a German philosopher and one of the central Enlightenment thinkers. Born in KÃ¶nigsberg , Kant's comprehensive and systematic works in epistemology , metaphysics , ethics , and aesthetics have made him one of the most influential and controversial figures in modern Western philosophy , being called the \"father of modern ethics\", \"father of modern aesthetics\" and, by bringing together rationalism and empiricism, the \"father of modern philosophy\".(7) (8) (9) (10)\n" + 
             "\n" + 
-            "Kant was born into an artisan family of modest means. his father was a master harness maker, "
-            + "and his mother was the daughter of a harness maker, though she was better educated than most "
-            + "women of her social class. Kant's family was never destitute, but his father's trade was in "
-            + "decline during Kant's youth and his parents at times had to rely on extended family for financial support.\n" + 
+            "In his doctrine of transcendental idealism , Kant argued space and time are mere \"forms of intuition\" that structure all experience and that the objects of experience are mere \"appearances\". The nature of things as they are in themselves is unknowable to us. In an attempt to counter the philosophical doctrine of skepticism , he wrote the Critique of Pure Reason (1781/1787), his best-known work. Kant drew a parallel to the Copernican revolution in his proposal to think of the objects of experience as conforming to our spatial and temporal forms of intuition and the categories of our understanding, so that we have a priori cognition of those objects. These claims have proved especially influential in the social sciences, particularly sociology and anthropology, which regard human activities as pre-oriented by cultural norms.(11)\n" + 
             "\n" + 
-            "Kant's parents were Pietist and he attended a Pietist school, the Collegium Fridericianum, "
-            + "from ages eight through fifteen. Pietism was an evangelical Lutheran movement that emphasized conversion, "
-            + "reliance on divine grace, the experience of religious emotions, and personal devotion involving "
-            + "regular Bible study, prayer, and introspection. Kant reacted strongly against the forced soul-searching "
-            + "to which he was subjected at the Collegium Fridericianum, in response to which he sought refuge "
-            + "in the Latin classics, which were central to the school's curriculum. Later the mature Kant's emphasis "
-            + "on reason and autonomy, rather than emotion and dependence on either authority or grace, may in part "
-            + "reflect his youthful reaction against Pietism. but although the young Kant loathed his Pietist schooling, "
-            + "he had deep respect and admiration for his parents, especially his mother, whose genuine religiosity "
-            + "he described as “not at all enthusiastic.” according to his biographer, Manfred Kuehn, "
-            + "Kant's parents probably influenced him much less through their Pietism than through their "
-            + "artisan values of “hard work, honesty, cleanliness, and independence,” which they taught him by example."
-            + "Kant attended college at the University of Konigsberg, known as the Albertina, where his early interest "
-            + "in classics was quickly superseded by philosophy, which all first year students studied and which "
-            + "encompassed mathematics and physics as well as logic, metaphysics, ethics, and natural law. Kant's "
-            + "philosophy professors exposed him to the approach of Christian Wolff (1679–1750), whose critical "
-            + "synthesis of the philosophy of G. W. Leibniz (1646–1716) was then very influential in German universities. "
-            + "but Kant was also exposed to a range of German and British critics of Wolff, and there were strong "
-            + "doses of Aristotelianism and Pietism represented in the philosophy faculty as well. Kant's favorite "
-            + "teacher was Martin Knutzen (1713–1751), a Pietist who was heavily influenced by both Wolff and the "
-            + "English philosopher John Locke (1632–1704). Knutzen introduced Kant to the work of "
-            + "Isaac Newton (1642–1727), and his influence is visible in Kant's first published work, "
-            + "Thoughts on the True Estimation of Living Forces (1747), which was a critical attempt to "
-            + "mediate a dispute in natural philosophy between Leibnizians and Newtonians over the proper measurement "
-            + "of force.\n" + 
+            "Kant believed that reason is the source of morality , and that aesthetics arises from a faculty of disinterested judgment. Kant's religious views were deeply connected to his moral theory. Their exact nature, however, remains in dispute. He hoped that perpetual peace could be secured through an international federation of republican states and international cooperation . His cosmopolitan reputation, however, is called into question by his promulgation of scientific racism for much of his career, although he altered his views on the subject in the last decade of his life.\n" + 
             "\n" + 
-            "after college Kant spent six years as a private tutor to young children outside Konigsberg. By this time "
-            + "both of his parents had died and Kant's finances were not yet secure enough for him to pursue an "
-            + "academic career. he finally returned to Konigsberg in 1754 and began teaching at the Albertina the "
-            + "following year. for the next four decades Kant taught philosophy there, until his retirement from "
-            + "teaching in 1796 at the age of seventy-two." + 
+            "Immanuel Kant was born on 22 April 1724 into a Prussian German family of Lutheran faith in KÃ¶nigsberg , East Prussia (since 1946 the Russian city of Kaliningrad ). His mother, Anna Regina Reuter, was born in KÃ¶nigsberg to a father from Nuremberg.(12) Her surname is sometimes erroneously given as Porter. Kant's father, Johann Georg Kant, was a German harness-maker from Memel , at the time Prussia's most northeastern city (now KlaipÄ—da , Lithuania ). It is possible that the Kants got their name from the village of Kantvainiai (German: Kantwaggen â€“ today part of PriekulÄ— ) and were of Kursenieki origin.(13) (14)\n" + 
             "\n" + 
-            "Kant had a burst of publishing activity in the years after he returned from working as a private tutor. "
-            + "in 1754 and 1755 he published three scientific works – one of which, Universal Natural History and Theory "
-            + "of the Heavens (1755), was a major book in which, among other things, he developed what later became "
-            + "known as the nebular hypothesis about the formation of the solar system. unfortunately, "
-            + "the printer went bankrupt and the book had little immediate impact. To secure qualifications for "
-            + "teaching at the university, Kant also wrote two Latin dissertations: the first, entitled "
-            + "Concise Outline of Some Reflections on Fire (1755), earned him the Magister degree; and the second, "
-            + "New Elucidation of the First Principles of Metaphysical Cognition (1755), entitled him to teach as "
-            + "an unsalaried lecturer. the following year he published another Latin work, the Employment in "
-            + "Natural Philosophy of Metaphysics Combined with Geometry, of Which Sample I Contains the "
-            + "Physical Monadology (1756), in hopes of succeeding Knutzen as associate professor of logic "
-            + "and metaphysics, though Kant failed to secure this position. both the New Elucidation, "
-            + "which was Kant's first work concerned mainly with metaphysics, and the Physical Monadology further "
-            + "develop the position on the interaction of finite substances that he first outlined in Living Forces. "
-            + "both works depart from Leibniz-Wolffian views, though not radically. the New Elucidation in "
-            + "particular shows the influence of Christian August Crusius (1715–1775), a German critic of Wolff." + 
+            "Emanuel was baptized and later changed the spelling of his name to Immanuel after learning Hebrew.(15) He was the fourth of nine children (six of whom reached adulthood).(16)\n" + 
             "\n" + 
-            "As an unsalaried lecturer at the Albertina Kant was paid directly by the students who attended his "
-            + "lectures, so he needed to teach an enormous amount and to attract many students in order to earn "
-            + "a living. Kant held this position from 1755 to 1770, during which period he would lecture an "
-            + "average of twenty hours per week on logic, metaphysics, and ethics, as well as mathematics, physics, "
-            + "and physical geography. in his lectures Kant used textbooks by Wolffian authors such as Alexander "
-            + "Gottlieb Baumgarten (1714–1762) and Georg Friedrich Meier (1718–1777), but he followed them loosely "
-            + "and used them to structure his own reflections, which drew on a wide range of ideas of "
-            + "contemporary interest. these ideas often stemmed from British sentimentalist philosophers "
-            + "such as David Hume (1711–1776) and Francis Hutcheson (1694–1747), some of whose texts were "
-            + "translated into German in the mid-1750s; and from the Swiss philosopher Jean-Jacques Rousseau "
-            + "(1712–1778), who published a flurry of works in the early 1760s. from early in his career Kant "
-            + "was a popular and successful lecturer. he also quickly developed a local reputation as a promising "
-            + "young intellectual and cut a dashing figure in Konigsberg society." + 
+            "The Kant household stressed the pietist values of religious devotion, humility, and a literal interpretation of the Bible.(17) The young Immanuel's education was strict, punitive and disciplinary, and focused on Latin and religious instruction over mathematics and science.(18)\n" + 
             "\n" + 
-            "after several years of relative quiet, Kant unleashed another burst of publications in 1762–1764, "
-            + "including five philosophical works. the False Subtlety of the Four Syllogistic Figures (1762) "
-            + "rehearses criticisms of Aristotelian logic that were developed by other German philosophers. "
-            + "the Only Possible Argument in Support of a Demonstration of the Existence of God (1762–3) is a "
-            + "major book in which Kant drew on his earlier work in Universal History and New Elucidation to "
-            + "develop an original argument for God's existence as a condition of the internal possibility of "
-            + "all things, while criticizing other arguments for God's existence. the book attracted several "
-            + "positive and some negative reviews. in 1762 Kant also submitted an essay entitled Inquiry "
-            + "Concerning the Distinctness of the Principles of Natural Theology and Morality to a prize competition "
-            + "by the Prussian Royal Academy, though Kant's submission took second prize to Moses Mendelssohn's "
-            + "winning essay (and was published with it in 1764). Kant's Prize Essay, as it is known, departs "
-            + "more significantly from Leibniz-Wolffian views than his earlier work and also contains his first "
-            + "extended discussion of moral philosophy in print. the Prize Essay draws on British sources to "
-            + "criticize German rationalism in two respects: first, drawing on Newton, Kant distinguishes between "
-            + "the methods of mathematics and philosophy; and second, drawing on Hutcheson, he claims that "
-            + "'an unanalysable feeling of the good' supplies the material content of our moral obligations, "
-            + "which cannot be demonstrated in a purely intellectual way from the formal principle of perfection "
-            + "alone (2:299). these themes reappear in the Attempt to Introduce the Concept of "
-            + "Negative Magnitudes into Philosophy (1763), whose main thesis, however, is that the real "
-            + "opposition of conflicting forces, as in causal relations, is not reducible to the logical "
-            + "relation of contradiction, as Leibnizians held. in Negative Magnitudes Kant also argues that "
-            + "the morality of an action is a function of the internal forces that motivate one to act, "
-            + "rather than of the external (physical) actions or their consequences. finally, Observations on the "
-            + "Feeling of the Beautiful and the Sublime (1764) deals mainly with alleged differences in the tastes"
-            + " of men and women and of people from different cultures. after it was published, Kant filled his own "
-            + "interleaved copy of this book with (often unrelated) handwritten remarks, many of which reflect "
-            + "the deep influence of Rousseau on his thinking about moral philosophy in the mid-1760s.";
+            "In his later years, Kant lived a strictly ordered life. It was said that neighbors would set their clocks by his daily walks. He never married but seems to have had a rewarding social life; he was a popular teacher as well as a modestly successful author, even before starting on his major philosophical works.(19)\n" + 
+            "\n" + 
+            "Kant showed a great aptitude for study at an early age. He first attended the Collegium Fridericianum , from which he graduated at the end of the summer of 1740. In 1740, aged 16, he enrolled at the University of KÃ¶nigsberg , where he would later remain for the rest of his professional life.(20) He studied the philosophy of Gottfried Leibniz and Christian Wolff under Martin Knutzen (Associate Professor of Logic and Metaphysics from 1734 until he died in 1751), a rationalist who was also familiar with developments in British philosophy and science and introduced Kant to the new mathematical physics of Isaac Newton . Knutzen dissuaded Kant from the theory of pre-established harmony , which he regarded as \"the pillow for the lazy mind\".(21) He also dissuaded Kant from idealism , the idea that reality is purely mental, which most philosophers in the 18th century regarded negatively. The theory of transcendental idealism that Kant later included in the Critique of Pure Reason was developed partially in opposition to traditional idealism.\n" + 
+            "\n" + 
+            "Kant had contacts with students, colleagues, friends and diners who frequented the local Masonic lodge.(22)\n" + 
+            "\n" + 
+            "His father's stroke and subsequent death in 1746 interrupted his studies. Kant left KÃ¶nigsberg shortly after August 1748;(23) he would return there in August 1754.(24) He became a private tutor in the towns surrounding KÃ¶nigsberg, but continued his scholarly research. In 1749, he published his first philosophical work, Thoughts on the True Estimation of Living Forces (written in 1745â€“1747).(25)\n" + 
+            "\n" + 
+            "Kant is best known for his work in the philosophy of ethics and metaphysics, but he made significant contributions to other disciplines. In 1754, while contemplating on a prize question by the Berlin Academy about the problem of Earth's rotation, he argued that the Moon's gravity would slow down Earth's spin and he also put forth the argument that gravity would eventually cause the Moon's tidal locking to coincide with the Earth's rotation.(b) (27) The next year, he expanded this reasoning to the formation and evolution of the Solar System in his Universal Natural History and Theory of the Heavens.(27) In 1755, Kant received a license to lecture in the University of KÃ¶nigsberg and began lecturing on a variety of topics including mathematics, physics, logic, and metaphysics. In his 1756 essay on the theory of winds, Kant laid out an original insight into the Coriolis force .\n" + 
+            "\n" + 
+            "In 1756, Kant also published three papers on the 1755 Lisbon earthquake.(28) Kant's theory, which involved shifts in huge caverns filled with hot gases, though inaccurate, was one of the first systematic attempts to explain earthquakes in natural rather than supernatural terms. In 1757, Kant began lecturing on geography making him one of the first lecturers to explicitly teach geography as its own subject.(29) (30) Geography was one of Kant's most popular lecturing topics and, in 1802, a compilation by Friedrich Theodor Rink of Kant's lecturing notes, Physical Geography, was released. After Kant became a professor in 1770, he expanded the topics of his lectures to include lectures on natural law, ethics, and anthropology, along with other topics.(29)\n" + 
+            "\n" + 
+            "In the Universal Natural History, Kant laid out the nebular hypothesis , in which he deduced that the Solar System had formed from a large cloud of gas, a nebula . Kant also correctly deduced that the Milky Way was a large disk of stars , which he theorized formed from a much larger spinning gas cloud. He further suggested that other distant \"nebulae\" might be other galaxies. These postulations opened new horizons for astronomy, for the first time extending it beyond the solar system to galactic and intergalactic realms.(31)\n" + 
+            "\n" + 
+            "From then on, Kant turned increasingly to philosophical issues, although he continued to write on the sciences throughout his life. In the early 1760s, Kant produced a series of important works in philosophy. The False Subtlety of the Four Syllogistic Figures , a work in logic, was published in 1762. Two more works appeared the following year: Attempt to Introduce the Concept of Negative Magnitudes into Philosophy and The Only Possible Argument in Support of a Demonstration of the Existence of God . By 1764, Kant had become a notable popular author, and wrote Observations on the Feeling of the Beautiful and Sublime ; he was second to Moses Mendelssohn in a Berlin Academy prize competition with his Inquiry Concerning the Distinctness of the Principles of Natural Theology and Morality (often referred to as \"The Prize Essay\"). In 1766 Kant wrote a critical piece on Emanuel Swedenborg 's Dreams of a Spirit-Seer.\n" + 
+            "\n" + 
+            "In 1770, Kant was appointed Full Professor of Logic and Metaphysics at the University of KÃ¶nigsberg. In defense of this appointment, Kant wrote his inaugural dissertation On the Form and Principles of the Sensible and the Intelligible World(c) This work saw the emergence of several central themes of his mature work, including the distinction between the faculties of intellectual thought and sensible receptivity. To miss this distinction would mean to commit the error of subreption , and, as he says in the last chapter of the dissertation, only in avoiding this error does metaphysics flourish.\n" + 
+            "\n" + 
+            "It is often claimed that Kant was a late developer, that he only became an important philosopher in his mid-50's after rejecting his earlier views. While it is true that Kant wrote his greatest works relatively late in life, there is a tendency to underestimate the value of his earlier works. Recent Kant scholarship has devoted more attention to these \"pre-critical\" writings and has recognized a degree of continuity with his mature work.(32)\n" + 
+            "\n" + 
+            "At age 46, Kant was an established scholar and an increasingly influential philosopher, and much was expected of him. In correspondence with his ex-student and friend Markus Herz , Kant admitted that, in the inaugural dissertation, he had failed to account for the relation between our sensible and intellectual faculties.(33) He needed to explain how we combine what is known as sensory knowledge with the other type of knowledgeâ€”that is, reasoned knowledgeâ€”these two being related, but having very different processes. \n" + 
+            "\n";
 }

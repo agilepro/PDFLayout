@@ -138,6 +138,9 @@ public class ControlCharacters {
 
         protected ColorControlCharacter(final String hex) {
             super("COLOR", ColorControlCharacterFactory.TO_ESCAPE);
+            if (hex.length()<6) {
+                throw new RuntimeException("Attempt to conver color string, but too short: "+hex);
+            }
             int r = Integer.parseUnsignedInt(hex.substring(0, 2), 16);
             int g = Integer.parseUnsignedInt(hex.substring(2, 4), 16);
             int b = Integer.parseUnsignedInt(hex.substring(4, 6), 16);
